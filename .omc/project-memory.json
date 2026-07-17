@@ -1,0 +1,453 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1784208448728,
+  "projectRoot": "/Users/egorzozula/Desktop/drug",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": "^18.20.2 || >=20.9.0",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.6",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "@playwright/test",
+        "version": "1.58.2",
+        "category": "testing"
+      },
+      {
+        "name": "vitest",
+        "version": "4.0.18",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": "Node.js 18.20.2||20.9.0"
+  },
+  "build": {
+    "buildCommand": "pnpm build",
+    "testCommand": "pnpm test",
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+      "postbuild": "next-sitemap --config next-sitemap.config.cjs",
+      "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+      "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
+      "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+      "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+      "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
+      "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+      "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
+      "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+      "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
+      "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+      "test": "pnpm run test:int && pnpm run test:e2e",
+      "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
+      "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": true,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "src",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 3,
+      "lastAccessed": 1784208448528,
+      "keyFiles": [
+        "favicon.ico",
+        "favicon.svg",
+        "website-template-OG.webp"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1784208448531,
+      "keyFiles": [
+        "cssVariables.js",
+        "environment.d.ts",
+        "payload-types.ts",
+        "payload.config.ts"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1784208448539,
+      "keyFiles": []
+    },
+    "src/app": {
+      "path": "src/app",
+      "purpose": "Application code",
+      "fileCount": 0,
+      "lastAccessed": 1784208448686,
+      "keyFiles": []
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1784208448706,
+      "keyFiles": []
+    },
+    "tests/helpers": {
+      "path": "tests/helpers",
+      "purpose": "Helper functions",
+      "fileCount": 2,
+      "lastAccessed": 1784208448713,
+      "keyFiles": [
+        "login.ts",
+        "seedUser.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/collections/Posts/index.ts",
+      "accessCount": 14,
+      "lastAccessed": 1784280526048,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/[slug]/page.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1784279440360,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-2-report.md",
+      "accessCount": 7,
+      "lastAccessed": 1784236761830,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/page.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1784279420331,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/page/[pageNumber]/page.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1784279424042,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Posts/hooks/revalidatePost.ts",
+      "accessCount": 7,
+      "lastAccessed": 1784280527907,
+      "type": "file"
+    },
+    {
+      "path": "src/payload.config.ts",
+      "accessCount": 6,
+      "lastAccessed": 1784280518131,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/formatBlogDate.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784238387753,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Pagination/index.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1784239112398,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Tags.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784280526473,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Categories.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784280526985,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Link/index.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784274472772,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Card/index.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784274473374,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/generatePreviewPath.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784274498758,
+      "type": "file"
+    },
+    {
+      "path": "src/components/RichText/index.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784274632513,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-1-brief.md",
+      "accessCount": 3,
+      "lastAccessed": 1784211989235,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-2-brief.md",
+      "accessCount": 3,
+      "lastAccessed": 1784236347565,
+      "type": "file"
+    },
+    {
+      "path": "tests/int/formatBlogDate.int.spec.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784236634814,
+      "type": "file"
+    },
+    {
+      "path": "tests/int/readTime.int.spec.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784236638108,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/(sitemaps)/posts-sitemap.xml/route.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784236950813,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-07-16-blog-drug-card-design.md",
+      "accessCount": 3,
+      "lastAccessed": 1784274463827,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-1-report.md",
+      "accessCount": 2,
+      "lastAccessed": 1784211989810,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/posts/[slug]/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784236936641,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/(sitemaps)/pages-sitemap.xml/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784236997737,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-3-brief.md",
+      "accessCount": 2,
+      "lastAccessed": 1784237275315,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-3-report.md",
+      "accessCount": 2,
+      "lastAccessed": 1784237275750,
+      "type": "file"
+    },
+    {
+      "path": "src/blocks/RelatedPosts/Component.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784237328314,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-4-brief.md",
+      "accessCount": 2,
+      "lastAccessed": 1784237964949,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/readTime.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784238387685,
+      "type": "file"
+    },
+    {
+      "path": "src/payload-types.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784239546425,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/formatAuthors.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784274498430,
+      "type": "file"
+    },
+    {
+      "path": "src/components/CollectionArchive/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784274576504,
+      "type": "file"
+    },
+    {
+      "path": "src/access/authenticated.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784280536833,
+      "type": "file"
+    },
+    {
+      "path": "src/access/anyone.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784280538454,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/posts/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784209313345,
+      "type": "file"
+    },
+    {
+      "path": "src/heros/PostHero/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784209331036,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/posts/page/[pageNumber]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784209331450,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/formatDateTime.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784209366120,
+      "type": "file"
+    },
+    {
+      "path": "src/blocks/CallToAction/config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784210378131,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-535c2ab..fa2e85b.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784211992547,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-fa2e85b..156976e.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784215546854,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-task2.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784236348050,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-task2-v2.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784236742888,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-task3.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784237278284,
+      "type": "file"
+    },
+    {
+      "path": "src/endpoints/seed/home.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784237361263,
+      "type": "file"
+    },
+    {
+      "path": "src/fields/link.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784237423547,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/review-task3-v2.diff",
+      "accessCount": 1,
+      "lastAccessed": 1784237580267,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/page.client.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784237773829,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/page/[pageNumber]/page.client.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784237774171,
+      "type": "file"
+    },
+    {
+      "path": "src/components/PageRange/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784237775034,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

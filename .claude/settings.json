@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mongosh \"mongodb://127.0.0.1/drug\" --quiet --eval 'print\\(\"posts:\", db.posts.countDocuments\\(\\)\\)')"
+    ]
+  }
+}
