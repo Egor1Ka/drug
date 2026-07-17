@@ -155,6 +155,12 @@
       "type": "file"
     },
     {
+      "path": "src/collections/Posts/hooks/revalidatePost.ts",
+      "accessCount": 11,
+      "lastAccessed": 1784294942271,
+      "type": "file"
+    },
+    {
       "path": "src/app/(frontend)/blog/[slug]/page.tsx",
       "accessCount": 9,
       "lastAccessed": 1784279440360,
@@ -176,12 +182,6 @@
       "path": "src/app/(frontend)/blog/page/[pageNumber]/page.tsx",
       "accessCount": 7,
       "lastAccessed": 1784279424042,
-      "type": "file"
-    },
-    {
-      "path": "src/collections/Posts/hooks/revalidatePost.ts",
-      "accessCount": 7,
-      "lastAccessed": 1784280527907,
       "type": "file"
     },
     {
