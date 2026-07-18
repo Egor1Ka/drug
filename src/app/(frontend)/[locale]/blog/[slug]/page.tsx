@@ -72,7 +72,9 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
-  const readTime = calculateReadTime(post.content)
+  // Pre-localization documents may miss the localized content — never crash the build on it
+  const hasContent = Boolean(post.content)
+  const readTime = hasContent ? calculateReadTime(post.content) : null
   const publishedDate = post.publishedAt ? formatBlogDate(post.publishedAt) : null
   const heroImage = post.heroImage && typeof post.heroImage === 'object' ? post.heroImage : null
   const tags = post.tags || []
@@ -97,7 +99,9 @@ export default async function Post({ params: paramsPromise }: Args) {
           <Show when={publishedDate}>
             <time dateTime={post.publishedAt || undefined}>{publishedDate}</time>
           </Show>
-          <span>{readTime} min read</span>
+          <Show when={readTime}>
+            <span>{readTime} min read</span>
+          </Show>
         </div>
 
         <Show when={tags.length > 0}>
@@ -113,9 +117,11 @@ export default async function Post({ params: paramsPromise }: Args) {
         </Show>
       </BlogPostLayout.Header>
 
-      <BlogPostLayout.Content>
-        <RichText className="mx-auto max-w-[48rem]" data={post.content} enableGutter={false} />
-      </BlogPostLayout.Content>
+      <Show when={hasContent}>
+        <BlogPostLayout.Content>
+          <RichText className="mx-auto max-w-[48rem]" data={post.content} enableGutter={false} />
+        </BlogPostLayout.Content>
+      </Show>
 
       <Show when={similarPosts.length > 0}>
         <BlogPostLayout.Similar>
