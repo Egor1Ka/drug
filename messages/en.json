@@ -11,5 +11,101 @@
     "learnMore": "Learn more",
     "showingRange": "Showing {from} - {to} of {total} {total, plural, one {Post} other {Posts}}",
     "noResults": "No posts found."
+  },
+  "Home": {
+    "meta": {
+      "title": "DrugCard — AI-powered pharmacovigilance automation",
+      "description": "Streamline your drug safety routines: global and local literature monitoring and regulatory intelligence with DrugCard."
+    },
+    "hero": {
+      "headline": "AI-powered pharmacovigilance automation for global and local literature monitoring and regulatory intelligence.",
+      "tagline": "Streamline your drug safety routines with us",
+      "cta": "Contact us"
+    },
+    "video": {
+      "title": "DrugCard product overview"
+    },
+    "pressures": {
+      "heading": "Pharmacovigilance evolving rapidly. We understand your pressures",
+      "intro": "What has changed in the last 3-5 years and how this affected the industry",
+      "cards": {
+        "aiCompetition": {
+          "title": "AI-Competition",
+          "text": "Growth has slowed down as new aggressive entrants with AI-tech shake the status quo."
+        },
+        "techAge": {
+          "title": "Tech / digital age",
+          "text": "New heavy investments have longer paybacks while the change cycles have shrinked."
+        },
+        "audits": {
+          "title": "Audits / regulatory pressure",
+          "text": "The number of audits has increased. More and more non-compliance cases and mitigations."
+        },
+        "peopleCosts": {
+          "title": "People costs are rising",
+          "text": "Good people leaving increases the retention costs, while the new talent costs more. Heavy investments in staff training and onboarding new talents."
+        },
+        "marketStress": {
+          "title": "New pinches strike harder and harder",
+          "text": "People are stressed and it is hard to predict their buying behaviors. Adverse reactions become more frequent."
+        },
+        "newMarkets": {
+          "title": "Entering new markets",
+          "text": "Entering new markets has become longer, less predictable, and more costly."
+        }
+      }
+    },
+    "requirements": {
+      "heading": "Global pressures dictate new requirements to drug safety processes",
+      "intro": "With DrugCard these requirements will be under control:",
+      "items": {
+        "continuous": "Continuous and regular",
+        "traceable": "Traceable and transparent",
+        "accurate": "Accurate, complete, holistic",
+        "scalable": "Scalable to new markets",
+        "multiLanguage": "Multi-language",
+        "multiRegion": "Multi-region suppliers",
+        "capexFree": "CAPEX free investments",
+        "costEffective": "Cost-effective"
+      }
+    },
+    "stats": {
+      "heading": "About DrugCard platform in numbers"
+    },
+    "testimonials": {
+      "subtitle": "Trusted customers that can provide everything you need to generate awareness, drive traffic, connect"
+    },
+    "faq": {
+      "heading": "Frequently Asked Questions"
+    },
+    "segments": {
+      "heading": "DrugCard solution designed for",
+      "cta": "Talk to us",
+      "tabs": {
+        "cros": "CROs",
+        "mahs": "MAHs",
+        "freelancers": "Freelancers"
+      },
+      "cards": {
+        "cros": {
+          "title": "CROs can manage more PV projects and improve screening results",
+          "text": "When pharma outsource PV processes to CROs, they expect the highest quality and maximum search results to ensure full compliance with regulatory requirements. CROs can no longer guarantee the best results if they continue to read journals from cover to cover manually. Progressive CROs continuously discover innovative methods and tools to make their pharma customers fully compliant and satisfied."
+        },
+        "mahs": {
+          "title": "In-house local literature screening for MAHs",
+          "text": "Outsourcing of literature screening to CROs has become widespread in the last 5-7 years. However, we at DrugCard strongly believe that literature screening could be done more effectively in-house."
+        },
+        "freelancers": {
+          "title": "Free up time for other activities",
+          "text": "With DrugCard, freelancers providing literature screening and other outsourcing services can save up to 70% of their precious time."
+        }
+      }
+    },
+    "cta": {
+      "heading": "Enhance Your Pharmacovigilance",
+      "text": "Unleash the power of AI, automation and traceability with DrugCard",
+      "scheduleMeeting": "Schedule a meeting",
+      "requestDemo": "Request a demo"
+    }
   }
 }

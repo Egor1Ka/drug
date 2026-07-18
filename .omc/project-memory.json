@@ -157,9 +157,39 @@
   },
   "hotPaths": [
     {
+      "path": "src/payload.config.ts",
+      "accessCount": 8,
+      "lastAccessed": 1784368992582,
+      "type": "file"
+    },
+    {
+      "path": "messages/uk.json",
+      "accessCount": 8,
+      "lastAccessed": 1784373488219,
+      "type": "file"
+    },
+    {
       "path": "next.config.ts",
-      "accessCount": 5,
-      "lastAccessed": 1784298672146,
+      "accessCount": 7,
+      "lastAccessed": 1784372741773,
+      "type": "file"
+    },
+    {
+      "path": "messages/en.json",
+      "accessCount": 7,
+      "lastAccessed": 1784373485476,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/_features/blog/api/posts.ts",
+      "accessCount": 6,
+      "lastAccessed": 1784368487479,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Pages/index.ts",
+      "accessCount": 6,
+      "lastAccessed": 1784368823156,
       "type": "file"
     },
     {
@@ -169,21 +199,9 @@
       "type": "file"
     },
     {
-      "path": "src/payload.config.ts",
-      "accessCount": 5,
-      "lastAccessed": 1784299553880,
-      "type": "file"
-    },
-    {
       "path": "src/collections/Posts/index.ts",
       "accessCount": 5,
       "lastAccessed": 1784299559351,
-      "type": "file"
-    },
-    {
-      "path": "src/collections/Pages/index.ts",
-      "accessCount": 5,
-      "lastAccessed": 1784299562749,
       "type": "file"
     },
     {
@@ -196,12 +214,6 @@
       "path": "src/globals/Footer/config.ts",
       "accessCount": 5,
       "lastAccessed": 1784299567762,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/_features/blog/api/posts.ts",
-      "accessCount": 5,
-      "lastAccessed": 1784300056924,
       "type": "file"
     },
     {
@@ -229,15 +241,21 @@
       "type": "file"
     },
     {
-      "path": "src/plugins/index.ts",
-      "accessCount": 3,
-      "lastAccessed": 1784296551654,
+      "path": "docs/superpowers/specs/2026-07-17-i18n-en-uk-design.md",
+      "accessCount": 4,
+      "lastAccessed": 1784368530224,
       "type": "file"
     },
     {
-      "path": "docs/superpowers/specs/2026-07-17-i18n-en-uk-design.md",
+      "path": "package.json",
+      "accessCount": 4,
+      "lastAccessed": 1784384998625,
+      "type": "file"
+    },
+    {
+      "path": "src/plugins/index.ts",
       "accessCount": 3,
-      "lastAccessed": 1784297089395,
+      "lastAccessed": 1784296551654,
       "type": "file"
     },
     {
@@ -295,12 +313,6 @@
       "type": "file"
     },
     {
-      "path": "package.json",
-      "accessCount": 2,
-      "lastAccessed": 1784296582723,
-      "type": "file"
-    },
-    {
       "path": ".superpowers/sdd/progress.md",
       "accessCount": 2,
       "lastAccessed": 1784298609256,
@@ -316,18 +328,6 @@
       "path": "src/i18n/request.ts",
       "accessCount": 2,
       "lastAccessed": 1784298691819,
-      "type": "file"
-    },
-    {
-      "path": "messages/en.json",
-      "accessCount": 2,
-      "lastAccessed": 1784298694332,
-      "type": "file"
-    },
-    {
-      "path": "messages/uk.json",
-      "accessCount": 2,
-      "lastAccessed": 1784298694764,
       "type": "file"
     },
     {
@@ -373,15 +373,21 @@
       "type": "file"
     },
     {
-      "path": ".claude/skills/payload/reference/ADVANCED.md",
-      "accessCount": 1,
-      "lastAccessed": 1784296739374,
+      "path": "src/collections/Posts/hooks/revalidatePost.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784368486568,
       "type": "file"
     },
     {
-      "path": "src/collections/Posts/hooks/revalidatePost.ts",
+      "path": "src/app/(frontend)/_features/blog/ui/BlogCard.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784369315387,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/payload/reference/ADVANCED.md",
       "accessCount": 1,
-      "lastAccessed": 1784297740980,
+      "lastAccessed": 1784296739374,
       "type": "file"
     },
     {
@@ -442,12 +448,6 @@
       "path": "src/app/(frontend)/(sitemaps)/pages-sitemap.xml/route.ts",
       "accessCount": 1,
       "lastAccessed": 1784297979695,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/_features/blog/ui/BlogCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1784297980579,
       "type": "file"
     },
     {

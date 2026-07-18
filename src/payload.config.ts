@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
+import { PageContent } from './collections/PageContent'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Tags } from './collections/Tags'
@@ -61,7 +62,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Tags, Users],
+  collections: [Pages, PageContent, Posts, Media, Categories, Tags, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   // Locale list must match src/i18n/routing.ts (frontend routing source of truth)

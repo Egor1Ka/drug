@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     pages: Page;
+    'page-content': PageContent;
     posts: Post;
     media: Media;
     categories: Category;
@@ -90,6 +91,7 @@ export interface Config {
   };
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
+    'page-content': PageContentSelect<false> | PageContentSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
@@ -789,6 +791,141 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * Editable content for hand-coded pages. One document per page; the page code places sections by their keys — block order here does not affect the layout.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-content".
+ */
+export interface PageContent {
+  id: string;
+  /**
+   * Route identifier: 'home' → /, otherwise /<pageKey> (e.g. 'pricing' → /pricing)
+   */
+  pageKey: string;
+  sections?:
+    (FaqSectionBlock | TestimonialsSectionBlock | LogosSectionBlock | StatsSectionBlock | TeamSectionBlock)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqSectionBlock".
+ */
+export interface FaqSectionBlock {
+  /**
+   * Identifier the page code uses to place this section (e.g. "faq-main"). A block whose key is not expected by the page code will not be rendered.
+   */
+  sectionKey: string;
+  heading?: string | null;
+  items: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsSectionBlock".
+ */
+export interface TestimonialsSectionBlock {
+  /**
+   * Identifier the page code uses to place this section (e.g. "faq-main"). A block whose key is not expected by the page code will not be rendered.
+   */
+  sectionKey: string;
+  heading?: string | null;
+  items: {
+    quote: string;
+    authorName: string;
+    authorRole?: string | null;
+    photo?: (string | null) | Media;
+    link?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogosSectionBlock".
+ */
+export interface LogosSectionBlock {
+  /**
+   * Identifier the page code uses to place this section (e.g. "faq-main"). A block whose key is not expected by the page code will not be rendered.
+   */
+  sectionKey: string;
+  heading?: string | null;
+  items: {
+    logo: string | Media;
+    link?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'logos';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsSectionBlock".
+ */
+export interface StatsSectionBlock {
+  /**
+   * Identifier the page code uses to place this section (e.g. "faq-main"). A block whose key is not expected by the page code will not be rendered.
+   */
+  sectionKey: string;
+  items: {
+    /**
+     * e.g. "100+" or "60%"
+     */
+    value: string;
+    label: string;
+    sublabel?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamSectionBlock".
+ */
+export interface TeamSectionBlock {
+  /**
+   * Identifier the page code uses to place this section (e.g. "faq-main"). A block whose key is not expected by the page code will not be rendered.
+   */
+  sectionKey: string;
+  heading?: string | null;
+  items: {
+    name: string;
+    role: string;
+    description?: string | null;
+    photo?: (string | null) | Media;
+    linkedinUrl?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'team';
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -950,6 +1087,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'page-content';
+        value: string | PageContent;
       } | null)
     | ({
         relationTo: 'posts';
@@ -1161,6 +1302,115 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-content_select".
+ */
+export interface PageContentSelect<T extends boolean = true> {
+  pageKey?: T;
+  sections?:
+    | T
+    | {
+        faq?: T | FaqSectionBlockSelect<T>;
+        testimonials?: T | TestimonialsSectionBlockSelect<T>;
+        logos?: T | LogosSectionBlockSelect<T>;
+        stats?: T | StatsSectionBlockSelect<T>;
+        team?: T | TeamSectionBlockSelect<T>;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqSectionBlock_select".
+ */
+export interface FaqSectionBlockSelect<T extends boolean = true> {
+  sectionKey?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsSectionBlock_select".
+ */
+export interface TestimonialsSectionBlockSelect<T extends boolean = true> {
+  sectionKey?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        quote?: T;
+        authorName?: T;
+        authorRole?: T;
+        photo?: T;
+        link?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogosSectionBlock_select".
+ */
+export interface LogosSectionBlockSelect<T extends boolean = true> {
+  sectionKey?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        logo?: T;
+        link?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsSectionBlock_select".
+ */
+export interface StatsSectionBlockSelect<T extends boolean = true> {
+  sectionKey?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        sublabel?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamSectionBlock_select".
+ */
+export interface TeamSectionBlockSelect<T extends boolean = true> {
+  sectionKey?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        description?: T;
+        photo?: T;
+        linkedinUrl?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

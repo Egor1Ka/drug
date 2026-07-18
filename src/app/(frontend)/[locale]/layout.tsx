@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
+import { Nunito } from 'next/font/google'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -19,6 +19,9 @@ import { draftMode } from 'next/headers'
 
 import '../globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+
+// Brand font of drug-card.io; cyrillic subset covers the uk locale
+const nunito = Nunito({ subsets: ['latin', 'cyrillic'], variable: '--font-nunito' })
 
 type Args = {
   children: React.ReactNode
@@ -42,7 +45,7 @@ export default async function LocaleLayout({ children, params }: Args) {
 
   return (
     <html
-      className={cn(GeistSans.variable, GeistMono.variable)}
+      className={cn(nunito.variable, GeistMono.variable)}
       lang={locale}
       suppressHydrationWarning
     >
