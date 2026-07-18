@@ -1,15 +1,16 @@
 import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { getPayload, type TypedLocale } from 'payload'
 import { cache } from 'react'
 
-// Primitive argument keeps React cache() memoization working across
+// Primitive arguments keep React cache() memoization working across
 // the page render and generateMetadata — one DB hit per request.
-export const fetchTagBySlug = cache(async (slug: string) => {
+export const fetchTagBySlug = cache(async (slug: string, locale: TypedLocale) => {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
     collection: 'tags',
     limit: 1,
+    locale,
     overrideAccess: false,
     pagination: false,
     where: {

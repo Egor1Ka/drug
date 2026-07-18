@@ -1,0 +1,15 @@
+{
+  "Blog": {
+    "title": "Блог",
+    "pageTitle": "Блог — сторінка {page}",
+    "postsTagged": "Пости з тегом",
+    "taggedMetaTitle": "Пости з тегом {tag} — Блог",
+    "minRead": "{minutes} хв читання",
+    "home": "Головна",
+    "allCategories": "Усі",
+    "similarPosts": "Схожі пости",
+    "learnMore": "Читати далі",
+    "showingRange": "Показано {from} - {to} з {total} {total, plural, one {пост} few {пости} many {постів} other {постів}}",
+    "noResults": "Постів не знайдено."
+  }
+}

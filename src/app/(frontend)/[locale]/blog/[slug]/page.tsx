@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 
 import { draftMode } from 'next/headers'
+import { setRequestLocale } from 'next-intl/server'
 import React from 'react'
 
+import type { AppLocale } from '@/i18n/routing'
 import type { Category, Post } from '@/payload-types'
 
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -27,6 +29,7 @@ import PageClient from './page.client'
 
 type Args = {
   params: Promise<{
+    locale: AppLocale
     slug?: string
   }>
 }
@@ -58,11 +61,14 @@ const buildCrumbs = (post: Post): Crumb[] => {
 }
 
 export default async function Post({ params: paramsPromise }: Args) {
+  const { locale, slug = '' } = await paramsPromise
+
+  setRequestLocale(locale)
+
   const { isEnabled: draft } = await draftMode()
-  const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const url = '/blog/' + decodedSlug
-  const post = await fetchPostBySlug(decodedSlug)
+  const post = await fetchPostBySlug(decodedSlug, locale)
 
   if (!post) return <PayloadRedirects url={url} />
 
@@ -70,7 +76,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const publishedDate = post.publishedAt ? formatBlogDate(post.publishedAt) : null
   const heroImage = post.heroImage && typeof post.heroImage === 'object' ? post.heroImage : null
   const tags = post.tags || []
-  const similarPosts = await fetchSimilarPosts(post)
+  const similarPosts = await fetchSimilarPosts(post, locale)
 
   return (
     <BlogPostLayout>
@@ -121,10 +127,10 @@ export default async function Post({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = '' } = await paramsPromise
+  const { locale, slug = '' } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const post = await fetchPostBySlug(decodedSlug)
+  const post = await fetchPostBySlug(decodedSlug, locale)
 
   return generateMeta({ doc: post })
 }

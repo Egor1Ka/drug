@@ -1,6 +1,6 @@
 import configPromise from '@payload-config'
 import { draftMode } from 'next/headers'
-import { getPayload, type Where } from 'payload'
+import { getPayload, type TypedLocale, type Where } from 'payload'
 import { cache } from 'react'
 
 import type { Post } from '@/payload-types'
@@ -26,16 +26,22 @@ const byCategorySlug = (slug: string): Where => ({
 
 type PublishedPostsPageArgs = {
   category?: string
+  locale: TypedLocale
   page: number
 }
 
-export const fetchPublishedPostsPage = async ({ category, page }: PublishedPostsPageArgs) => {
+export const fetchPublishedPostsPage = async ({
+  category,
+  locale,
+  page,
+}: PublishedPostsPageArgs) => {
   const payload = await getPayload({ config: configPromise })
 
   return payload.find({
     collection: 'posts',
     depth: 1,
     limit: POSTS_PER_PAGE,
+    locale,
     overrideAccess: false,
     page,
     select: blogCardSelect,
@@ -45,17 +51,19 @@ export const fetchPublishedPostsPage = async ({ category, page }: PublishedPosts
 }
 
 type PostsByTagArgs = {
+  locale: TypedLocale
   page: number
   slug: string
 }
 
-export const fetchPostsByTag = async ({ page, slug }: PostsByTagArgs) => {
+export const fetchPostsByTag = async ({ locale, page, slug }: PostsByTagArgs) => {
   const payload = await getPayload({ config: configPromise })
 
   return payload.find({
     collection: 'posts',
     depth: 1,
     limit: POSTS_PER_PAGE,
+    locale,
     overrideAccess: false,
     page,
     select: blogCardSelect,
@@ -68,9 +76,9 @@ export const fetchPostsByTag = async ({ page, slug }: PostsByTagArgs) => {
   })
 }
 
-// Primitive argument keeps React cache() memoization working across
+// Primitive arguments keep React cache() memoization working across
 // the page render and generateMetadata — one DB hit per request.
-export const fetchPostBySlug = cache(async (slug: string) => {
+export const fetchPostBySlug = cache(async (slug: string, locale: TypedLocale) => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
@@ -79,6 +87,7 @@ export const fetchPostBySlug = cache(async (slug: string) => {
     collection: 'posts',
     draft,
     limit: 1,
+    locale,
     overrideAccess: draft,
     pagination: false,
     where: {
@@ -130,7 +139,7 @@ const getFirstCategoryId = (post: Post): string | null => {
   return typeof first === 'object' ? String(first.id) : String(first)
 }
 
-const fetchSameCategoryPosts = async (post: Post) => {
+const fetchSameCategoryPosts = async (post: Post, locale: TypedLocale) => {
   const categoryId = getFirstCategoryId(post)
 
   if (!categoryId) return []
@@ -140,6 +149,7 @@ const fetchSameCategoryPosts = async (post: Post) => {
     collection: 'posts',
     depth: 1,
     limit: 3,
+    locale,
     overrideAccess: false,
     select: blogCardSelect,
     sort: '-publishedAt',
@@ -151,10 +161,10 @@ const fetchSameCategoryPosts = async (post: Post) => {
   return result.docs
 }
 
-export const fetchSimilarPosts = async (post: Post) => {
+export const fetchSimilarPosts = async (post: Post, locale: TypedLocale) => {
   const relatedPosts = (post.relatedPosts || []).filter(isPostObject)
 
   if (relatedPosts.length > 0) return relatedPosts
 
-  return fetchSameCategoryPosts(post)
+  return fetchSameCategoryPosts(post, locale)
 }

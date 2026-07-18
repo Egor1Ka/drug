@@ -10,8 +10,8 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Tags } from './collections/Tags'
 import { Users } from './collections/Users'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
+import { Footer } from './globals/Footer/config'
+import { Header } from './globals/Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -64,6 +64,15 @@ export default buildConfig({
   collections: [Pages, Posts, Media, Categories, Tags, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
+  // Locale list must match src/i18n/routing.ts (frontend routing source of truth)
+  localization: {
+    locales: [
+      { label: 'English', code: 'en' },
+      { label: 'Українська', code: 'uk' },
+    ],
+    defaultLocale: 'en',
+    fallback: true,
+  },
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

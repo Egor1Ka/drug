@@ -1,0 +1,15 @@
+{
+  "Blog": {
+    "title": "Blog",
+    "pageTitle": "Blog — Page {page}",
+    "postsTagged": "Posts tagged",
+    "taggedMetaTitle": "Posts tagged {tag} — Blog",
+    "minRead": "{minutes} min read",
+    "home": "Home",
+    "allCategories": "All",
+    "similarPosts": "Similar Posts",
+    "learnMore": "Learn more",
+    "showingRange": "Showing {from} - {to} of {total} {total, plural, one {Post} other {Posts}}",
+    "noResults": "No posts found."
+  }
+}

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1784208448728,
+  "lastScanned": 1784296133075,
   "projectRoot": "/Users/egorzozula/Desktop/drug",
   "techStack": {
     "languages": [
@@ -84,6 +84,7 @@
     "isMonorepo": true,
     "workspaces": [],
     "mainDirectories": [
+      "docs",
       "public",
       "src",
       "tests"
@@ -92,11 +93,18 @@
   },
   "customNotes": [],
   "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1784296133055,
+      "keyFiles": []
+    },
     "public": {
       "path": "public",
       "purpose": "Public files",
       "fileCount": 3,
-      "lastAccessed": 1784208448528,
+      "lastAccessed": 1784296133055,
       "keyFiles": [
         "favicon.ico",
         "favicon.svg",
@@ -107,7 +115,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1784208448531,
+      "lastAccessed": 1784296133059,
       "keyFiles": [
         "cssVariables.js",
         "environment.d.ts",
@@ -119,28 +127,28 @@
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 0,
-      "lastAccessed": 1784208448539,
+      "lastAccessed": 1784296133059,
       "keyFiles": []
     },
     "src/app": {
       "path": "src/app",
       "purpose": "Application code",
       "fileCount": 0,
-      "lastAccessed": 1784208448686,
+      "lastAccessed": 1784296133061,
       "keyFiles": []
     },
     "src/components": {
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 0,
-      "lastAccessed": 1784208448706,
+      "lastAccessed": 1784296133063,
       "keyFiles": []
     },
     "tests/helpers": {
       "path": "tests/helpers",
       "purpose": "Helper functions",
       "fileCount": 2,
-      "lastAccessed": 1784208448713,
+      "lastAccessed": 1784296133064,
       "keyFiles": [
         "login.ts",
         "seedUser.ts"
@@ -149,303 +157,303 @@
   },
   "hotPaths": [
     {
-      "path": "src/collections/Posts/index.ts",
-      "accessCount": 14,
-      "lastAccessed": 1784280526048,
+      "path": "next.config.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784298672146,
       "type": "file"
     },
     {
-      "path": "src/collections/Posts/hooks/revalidatePost.ts",
-      "accessCount": 11,
-      "lastAccessed": 1784294942271,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/blog/[slug]/page.tsx",
-      "accessCount": 9,
-      "lastAccessed": 1784279440360,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/task-2-report.md",
-      "accessCount": 7,
-      "lastAccessed": 1784236761830,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/blog/page.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1784279420331,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/blog/page/[pageNumber]/page.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1784279424042,
+      "path": ".superpowers/sdd/i18n-task-1-report.md",
+      "accessCount": 5,
+      "lastAccessed": 1784299390938,
       "type": "file"
     },
     {
       "path": "src/payload.config.ts",
-      "accessCount": 6,
-      "lastAccessed": 1784280518131,
+      "accessCount": 5,
+      "lastAccessed": 1784299553880,
       "type": "file"
     },
     {
-      "path": "src/utilities/formatBlogDate.ts",
+      "path": "src/collections/Posts/index.ts",
       "accessCount": 5,
-      "lastAccessed": 1784238387753,
+      "lastAccessed": 1784299559351,
       "type": "file"
     },
     {
-      "path": "src/components/Pagination/index.tsx",
+      "path": "src/collections/Pages/index.ts",
       "accessCount": 5,
-      "lastAccessed": 1784239112398,
+      "lastAccessed": 1784299562749,
       "type": "file"
     },
     {
-      "path": "src/collections/Tags.ts",
+      "path": "src/globals/Header/config.ts",
       "accessCount": 5,
-      "lastAccessed": 1784280526473,
+      "lastAccessed": 1784299566260,
+      "type": "file"
+    },
+    {
+      "path": "src/globals/Footer/config.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784299567762,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/_features/blog/api/posts.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784300056924,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-07-17-i18n-en-uk.md",
+      "accessCount": 4,
+      "lastAccessed": 1784298280746,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/i18n-task-1-review.md",
+      "accessCount": 4,
+      "lastAccessed": 1784299463010,
+      "type": "file"
+    },
+    {
+      "path": "src/heros/config.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784299565024,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/layout.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784299952487,
+      "type": "file"
+    },
+    {
+      "path": "src/plugins/index.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784296551654,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-07-17-i18n-en-uk-design.md",
+      "accessCount": 3,
+      "lastAccessed": 1784297089395,
+      "type": "file"
+    },
+    {
+      "path": "src/i18n/routing.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784299548073,
       "type": "file"
     },
     {
       "path": "src/collections/Categories.ts",
-      "accessCount": 5,
-      "lastAccessed": 1784280526985,
+      "accessCount": 3,
+      "lastAccessed": 1784299568848,
       "type": "file"
     },
     {
-      "path": "src/components/Link/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1784274472772,
+      "path": "src/collections/Tags.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784299570028,
       "type": "file"
     },
     {
-      "path": "src/components/Card/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1784274473374,
+      "path": "src/utilities/getGlobals.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784300016909,
       "type": "file"
     },
     {
-      "path": "src/utilities/generatePreviewPath.ts",
-      "accessCount": 4,
-      "lastAccessed": 1784274498758,
+      "path": "src/globals/Header/Component.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1784300021865,
       "type": "file"
     },
     {
-      "path": "src/components/RichText/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1784274632513,
+      "path": "src/app/(frontend)/_features/blog/api/categories.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784300061504,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/_features/blog/api/tags.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784300064931,
+      "type": "file"
+    },
+    {
+      "path": "src/globals/Header/Nav/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784296555392,
+      "type": "file"
+    },
+    {
+      "path": "src/endpoints/seed/index.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784296557105,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 2,
+      "lastAccessed": 1784296582723,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/progress.md",
+      "accessCount": 2,
+      "lastAccessed": 1784298609256,
+      "type": "file"
+    },
+    {
+      "path": "src/i18n/navigation.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784298691529,
+      "type": "file"
+    },
+    {
+      "path": "src/i18n/request.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784298691819,
+      "type": "file"
+    },
+    {
+      "path": "messages/en.json",
+      "accessCount": 2,
+      "lastAccessed": 1784298694332,
+      "type": "file"
+    },
+    {
+      "path": "messages/uk.json",
+      "accessCount": 2,
+      "lastAccessed": 1784298694764,
       "type": "file"
     },
     {
       "path": ".superpowers/sdd/task-1-brief.md",
-      "accessCount": 3,
-      "lastAccessed": 1784211989235,
+      "accessCount": 2,
+      "lastAccessed": 1784298794650,
       "type": "file"
     },
     {
-      "path": ".superpowers/sdd/task-2-brief.md",
-      "accessCount": 3,
-      "lastAccessed": 1784236347565,
+      "path": "src/app/(frontend)/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299952844,
       "type": "file"
     },
     {
-      "path": "tests/int/formatBlogDate.int.spec.ts",
-      "accessCount": 3,
-      "lastAccessed": 1784236634814,
+      "path": "src/app/(frontend)/[slug]/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299953136,
       "type": "file"
     },
     {
-      "path": "tests/int/readTime.int.spec.ts",
-      "accessCount": 3,
-      "lastAccessed": 1784236638108,
+      "path": "src/app/(frontend)/blog/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299959491,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/[slug]/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299959860,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/page/[pageNumber]/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299960728,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/blog/tag/[slug]/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784299960936,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/payload/reference/ADVANCED.md",
+      "accessCount": 1,
+      "lastAccessed": 1784296739374,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Posts/hooks/revalidatePost.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784297740980,
+      "type": "file"
+    },
+    {
+      "path": "src/collections/Pages/hooks/revalidatePage.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784297741894,
       "type": "file"
     },
     {
       "path": "src/app/(frontend)/(sitemaps)/posts-sitemap.xml/route.ts",
-      "accessCount": 3,
-      "lastAccessed": 1784236950813,
+      "accessCount": 1,
+      "lastAccessed": 1784297775599,
       "type": "file"
     },
     {
-      "path": "docs/superpowers/specs/2026-07-16-blog-drug-card-design.md",
-      "accessCount": 3,
-      "lastAccessed": 1784274463827,
+      "path": "src/app/(frontend)/_features/blog/ui/PageRange.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784297873144,
       "type": "file"
     },
     {
-      "path": ".superpowers/sdd/task-1-report.md",
-      "accessCount": 2,
-      "lastAccessed": 1784211989810,
+      "path": "src/app/(frontend)/_features/blog/ui/Pagination.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784297873631,
       "type": "file"
     },
     {
-      "path": "src/app/(frontend)/posts/[slug]/page.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1784236936641,
+      "path": "src/app/(frontend)/_features/blog/ui/Breadcrumbs.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784297874509,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/_features/blog/ui/SimilarPosts.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784297874927,
+      "type": "file"
+    },
+    {
+      "path": "src/app/(frontend)/_features/blog/ui/CategoryTabs.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1784297875894,
+      "type": "file"
+    },
+    {
+      "path": "src/utilities/formatBlogDate.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784297876391,
+      "type": "file"
+    },
+    {
+      "path": "src/fields/linkGroup.ts",
+      "accessCount": 1,
+      "lastAccessed": 1784297876627,
       "type": "file"
     },
     {
       "path": "src/app/(frontend)/(sitemaps)/pages-sitemap.xml/route.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784236997737,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/task-3-brief.md",
-      "accessCount": 2,
-      "lastAccessed": 1784237275315,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/task-3-report.md",
-      "accessCount": 2,
-      "lastAccessed": 1784237275750,
-      "type": "file"
-    },
-    {
-      "path": "src/blocks/RelatedPosts/Component.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1784237328314,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/task-4-brief.md",
-      "accessCount": 2,
-      "lastAccessed": 1784237964949,
-      "type": "file"
-    },
-    {
-      "path": "src/utilities/readTime.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784238387685,
-      "type": "file"
-    },
-    {
-      "path": "src/payload-types.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784239546425,
-      "type": "file"
-    },
-    {
-      "path": "src/utilities/formatAuthors.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784274498430,
-      "type": "file"
-    },
-    {
-      "path": "src/components/CollectionArchive/index.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1784274576504,
-      "type": "file"
-    },
-    {
-      "path": "src/access/authenticated.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784280536833,
-      "type": "file"
-    },
-    {
-      "path": "src/access/anyone.ts",
-      "accessCount": 2,
-      "lastAccessed": 1784280538454,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/posts/page.tsx",
       "accessCount": 1,
-      "lastAccessed": 1784209313345,
+      "lastAccessed": 1784297979695,
       "type": "file"
     },
     {
-      "path": "src/heros/PostHero/index.tsx",
+      "path": "src/app/(frontend)/_features/blog/ui/BlogCard.tsx",
       "accessCount": 1,
-      "lastAccessed": 1784209331036,
+      "lastAccessed": 1784297980579,
       "type": "file"
     },
     {
-      "path": "src/app/(frontend)/posts/page/[pageNumber]/page.tsx",
+      "path": "src/globals/Header/Component.client.tsx",
       "accessCount": 1,
-      "lastAccessed": 1784209331450,
-      "type": "file"
-    },
-    {
-      "path": "src/utilities/formatDateTime.ts",
-      "accessCount": 1,
-      "lastAccessed": 1784209366120,
-      "type": "file"
-    },
-    {
-      "path": "src/blocks/CallToAction/config.ts",
-      "accessCount": 1,
-      "lastAccessed": 1784210378131,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-535c2ab..fa2e85b.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784211992547,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-fa2e85b..156976e.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784215546854,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-task2.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784236348050,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-task2-v2.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784236742888,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-task3.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784237278284,
-      "type": "file"
-    },
-    {
-      "path": "src/endpoints/seed/home.ts",
-      "accessCount": 1,
-      "lastAccessed": 1784237361263,
-      "type": "file"
-    },
-    {
-      "path": "src/fields/link.ts",
-      "accessCount": 1,
-      "lastAccessed": 1784237423547,
-      "type": "file"
-    },
-    {
-      "path": ".superpowers/sdd/review-task3-v2.diff",
-      "accessCount": 1,
-      "lastAccessed": 1784237580267,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/blog/page.client.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1784237773829,
-      "type": "file"
-    },
-    {
-      "path": "src/app/(frontend)/blog/page/[pageNumber]/page.client.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1784237774171,
-      "type": "file"
-    },
-    {
-      "path": "src/components/PageRange/index.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1784237775034,
+      "lastAccessed": 1784297980913,
       "type": "file"
     }
   ],

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next/types'
 
 import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
 import React from 'react'
+
+import type { AppLocale } from '@/i18n/routing'
 
 import { Show } from '@frontend/_shared/ui/Show'
 import {
@@ -20,7 +23,7 @@ import PageClient from './page.client'
 export const revalidate = 600
 
 type Args = {
-  params: Promise<{ pageNumber: string }>
+  params: Promise<{ locale: AppLocale; pageNumber: string }>
 }
 
 const toPageParam = (_: unknown, index: number): { pageNumber: string } => ({
@@ -28,14 +31,17 @@ const toPageParam = (_: unknown, index: number): { pageNumber: string } => ({
 })
 
 export default async function Page({ params: paramsPromise }: Args) {
-  const { pageNumber } = await paramsPromise
+  const { locale, pageNumber } = await paramsPromise
+
+  setRequestLocale(locale)
+
   const sanitizedPageNumber = Number(pageNumber)
 
   if (!Number.isInteger(sanitizedPageNumber) || sanitizedPageNumber < 1) notFound()
 
   const [posts, categories] = await Promise.all([
-    fetchPublishedPostsPage({ page: sanitizedPageNumber }),
-    fetchAllCategories(),
+    fetchPublishedPostsPage({ locale, page: sanitizedPageNumber }),
+    fetchAllCategories(locale),
   ])
 
   return (
