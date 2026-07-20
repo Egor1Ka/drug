@@ -4,13 +4,12 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { Block, CollectionAfterChangeHook, Field, Plugin } from 'payload'
-import { revalidatePath } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
 import { Page, Post } from '@/payload-types'
-import { routing } from '@/i18n/routing'
 import { getServerSideURL } from '@/utilities/getURL'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
@@ -103,14 +102,17 @@ const buildFormFields = ({ defaultFields }: { defaultFields: Field[] }): Field[]
   ...defaultFields.map(applyFormFieldOverride),
 ]
 
-// Forms are embedded in static layouts, so a coarse layout revalidation per locale is enough.
-const revalidateFormLayouts: CollectionAfterChangeHook = ({ doc, req: { context, payload } }) => {
+// Forms are embedded in the statically-prerendered layout and fetched through
+// a tag-cached query (see forms/api/forms.ts), so invalidating the per-slug tag
+// regenerates every locale of the prerender — mirrors revalidateHeader. The
+// path-based revalidation this replaced never purged the dynamic-route
+// prerender on Vercel.
+const revalidateForm: CollectionAfterChangeHook = ({ doc, req: { context, payload } }) => {
   if (context.disableRevalidate) return doc
 
-  payload.logger.info(`Revalidating layouts after form change: ${doc.slug}`)
+  payload.logger.info(`Revalidating form: ${doc.slug}`)
 
-  const revalidateLocaleLayout = (locale: string) => revalidatePath(`/${locale}`, 'layout')
-  routing.locales.forEach(revalidateLocaleLayout)
+  revalidateTag(`form_${doc.slug}`, 'max')
 
   return doc
 }
@@ -162,7 +164,7 @@ export const plugins: Plugin[] = [
     formOverrides: {
       fields: buildFormFields,
       hooks: {
-        afterChange: [revalidateFormLayouts],
+        afterChange: [revalidateForm],
       },
     },
   }),
