@@ -1,6 +1,8 @@
 import config from '@payload-config'
 import { getPayload, type Payload } from 'payload'
 
+import type { Form } from '@/payload-types'
+
 const SITE = 'https://drug-card.io/wp-content/uploads'
 
 const toRichTextParagraph = (text: string) => ({
@@ -22,6 +24,98 @@ const toRichTextParagraph = (text: string) => ({
     version: 1,
   },
 })
+
+const CONTACT_FORM_SLUG = 'contact-us'
+
+const CONTACT_FORM_FIELDS = [
+  { blockType: 'text', labels: { en: 'Name', uk: "Ім'я" }, name: 'name' },
+  { blockType: 'text', labels: { en: 'Surname', uk: 'Прізвище' }, name: 'surname' },
+  { blockType: 'email', labels: { en: 'E-mail', uk: 'E-mail' }, name: 'email' },
+  { blockType: 'text', labels: { en: 'Phone number', uk: 'Номер телефону' }, name: 'phone' },
+  { blockType: 'text', labels: { en: 'Company', uk: 'Компанія' }, name: 'company' },
+] as const
+
+const CONTACT_FORM_COPY = {
+  en: {
+    confirmation: 'Thank you! We received your request and will contact you shortly.',
+    submit: 'Send',
+    title: 'Contact us',
+  },
+  uk: {
+    confirmation: "Дякуємо! Ми отримали вашу заявку та зв'яжемося з вами найближчим часом.",
+    submit: 'Надіслати',
+    title: 'Contact us',
+  },
+}
+
+type ContactFormRow = NonNullable<Form['fields']>[number]
+
+const toContactFieldEn = (field: (typeof CONTACT_FORM_FIELDS)[number]) => ({
+  blockType: field.blockType,
+  label: field.labels.en,
+  name: field.name,
+  required: true,
+})
+
+const buildContactFieldsEn = () =>
+  CONTACT_FORM_FIELDS.map(toContactFieldEn) as NonNullable<Form['fields']>
+
+const toUkLabelEntry = (field: (typeof CONTACT_FORM_FIELDS)[number]) =>
+  [field.name, field.labels.uk] as const
+
+const UK_LABEL_BY_NAME: Record<string, string> = Object.fromEntries(
+  CONTACT_FORM_FIELDS.map(toUkLabelEntry),
+)
+
+// The field structure (rows, names, required) is shared across locales —
+// the uk pass rewrites the SAME rows (ids preserved) with translated labels only.
+const toUkRow = (row: ContactFormRow) => ({
+  ...row,
+  label: UK_LABEL_BY_NAME[row.name] || row.label,
+})
+
+const enrichContactForm = async (payload: Payload) => {
+  const existing = await payload.find({
+    collection: 'forms',
+    limit: 1,
+    where: { slug: { equals: CONTACT_FORM_SLUG } },
+  })
+
+  if (existing.docs[0]) {
+    payload.logger.info('Form "contact-us" already exists — left untouched')
+    return
+  }
+
+  const created = await payload.create({
+    collection: 'forms',
+    context: { disableRevalidate: true },
+    data: {
+      confirmationMessage: toRichTextParagraph(CONTACT_FORM_COPY.en.confirmation),
+      confirmationType: 'message',
+      fields: buildContactFieldsEn(),
+      slug: CONTACT_FORM_SLUG,
+      submitButtonLabel: CONTACT_FORM_COPY.en.submit,
+      title: CONTACT_FORM_COPY.en.title,
+    },
+    locale: 'en',
+  })
+
+  const createdRows = (created.fields || []) as ContactFormRow[]
+
+  await payload.update({
+    collection: 'forms',
+    context: { disableRevalidate: true },
+    data: {
+      confirmationMessage: toRichTextParagraph(CONTACT_FORM_COPY.uk.confirmation),
+      fields: createdRows.map(toUkRow),
+      submitButtonLabel: CONTACT_FORM_COPY.uk.submit,
+    },
+    id: created.id,
+    locale: 'uk',
+  })
+
+  payload.logger.info('Created form "contact-us" (shared structure, en + uk labels)')
+}
 
 const LOGO_SOURCES = [
   { alt: 'Chiesi logo', url: `${SITE}/2026/01/chies.png` },
@@ -301,18 +395,18 @@ const enrichHomeContent = async () => {
       locale: 'en',
     })
     payload.logger.info(`Created page-content "home" (images: ${media ? 'attached' : 'skipped'})`)
-    return
+  } else {
+    await payload.update({
+      collection: 'page-content',
+      context: { disableRevalidate: true },
+      data: { sections },
+      id: homeDoc.id,
+      locale: 'en',
+    })
+    payload.logger.info(`Updated page-content "home" (images: ${media ? 'attached' : 'skipped'})`)
   }
 
-  await payload.update({
-    collection: 'page-content',
-    context: { disableRevalidate: true },
-    data: { sections },
-    id: homeDoc.id,
-    locale: 'en',
-  })
-
-  payload.logger.info(`Updated page-content "home" (images: ${media ? 'attached' : 'skipped'})`)
+  await enrichContactForm(payload)
 }
 
 await enrichHomeContent()

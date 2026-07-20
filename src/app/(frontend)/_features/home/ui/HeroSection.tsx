@@ -1,9 +1,7 @@
 import { useTranslations } from 'next-intl'
 import React from 'react'
 
-import { Link } from '@/i18n/navigation'
-
-import { CONTACT_PATH } from '../links'
+import { ContactModalTrigger } from '@frontend/_features/contact'
 
 export const HeroSection: React.FC = () => {
   const t = useTranslations('Home.hero')
@@ -14,12 +12,9 @@ export const HeroSection: React.FC = () => {
         {t('headline')}
       </h1>
       <p className="mt-3 text-xl font-medium text-foreground">{t('tagline')}</p>
-      <Link
-        className="mt-9 inline-block rounded-full bg-primary px-9 py-3.5 font-semibold text-primary-foreground transition hover:opacity-90"
-        href={CONTACT_PATH}
-      >
+      <ContactModalTrigger className="mt-9 inline-block cursor-pointer rounded-full bg-primary px-9 py-3.5 font-semibold text-primary-foreground transition hover:opacity-90">
         {t('cta')}
-      </Link>
+      </ContactModalTrigger>
     </div>
   )
 }
