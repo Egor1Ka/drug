@@ -4,10 +4,8 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
-import { Link } from '@/i18n/navigation'
 import { cn } from '@/utilities/ui'
-
-import { CONTACT_PATH } from '../links'
+import { ContactModalTrigger } from '@frontend/_features/contact'
 
 const SEGMENTS = [
   { imageSrc: '/home/segments/cros.jpg', key: 'cros' },
@@ -76,12 +74,9 @@ export const SegmentTabs: React.FC = () => {
           <p className="mt-5 leading-relaxed text-muted-foreground">
             {t(`cards.${activeSegment.key}.text`)}
           </p>
-          <Link
-            className="mt-9 inline-block rounded-full border border-border px-9 py-3 font-semibold text-primary transition hover:border-primary"
-            href={CONTACT_PATH}
-          >
+          <ContactModalTrigger className="mt-9 inline-block cursor-pointer rounded-full border border-border px-9 py-3 font-semibold text-primary transition hover:border-primary">
             {t('cta')}
-          </Link>
+          </ContactModalTrigger>
         </div>
       </div>
     </div>

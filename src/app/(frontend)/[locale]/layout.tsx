@@ -6,9 +6,12 @@ import { Nunito } from 'next/font/google'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { type TypedLocale } from 'payload'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { ContactModalProvider } from '@frontend/_features/contact'
+import { fetchFormBySlug } from '@frontend/_features/forms'
 import { Footer } from '@/globals/Footer/Component'
 import { Header } from '@/globals/Header/Component'
 import { routing, type AppLocale } from '@/i18n/routing'
@@ -42,6 +45,7 @@ export default async function LocaleLayout({ children, params }: Args) {
   setRequestLocale(locale)
 
   const { isEnabled } = await draftMode()
+  const contactForm = await fetchFormBySlug('contact-us', locale as TypedLocale)
 
   return (
     <html
@@ -57,15 +61,17 @@ export default async function LocaleLayout({ children, params }: Args) {
       <body>
         <NextIntlClientProvider>
           <Providers>
-            <AdminBar
-              adminBarProps={{
-                preview: isEnabled,
-              }}
-            />
+            <ContactModalProvider form={contactForm}>
+              <AdminBar
+                adminBarProps={{
+                  preview: isEnabled,
+                }}
+              />
 
-            <Header locale={locale} />
-            {children}
-            <Footer locale={locale} />
+              <Header locale={locale} />
+              {children}
+              <Footer locale={locale} />
+            </ContactModalProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>

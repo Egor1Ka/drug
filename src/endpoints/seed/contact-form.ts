@@ -90,7 +90,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
     {
       name: 'phone',
       blockName: 'phone',
-      blockType: 'number',
+      blockType: 'text',
       label: 'Phone',
       required: false,
       width: 100,
@@ -105,6 +105,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
     },
   ],
   redirect: undefined,
+  slug: 'contact-form',
   submitButtonLabel: 'Submit',
   title: 'Contact Form',
   updatedAt: '2023-01-12T21:47:41.374Z',

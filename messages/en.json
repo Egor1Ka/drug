@@ -12,6 +12,14 @@
     "showingRange": "Showing {from} - {to} of {total} {total, plural, one {Post} other {Posts}}",
     "noResults": "No posts found."
   },
+  "ContactModal": {
+    "title": "Contact us",
+    "subtitle": "Leave your details and we will get back to you shortly",
+    "sending": "Sending...",
+    "unavailable": "The form is temporarily unavailable. Please email us instead.",
+    "error": "Something went wrong. Please try again.",
+    "close": "Close"
+  },
   "Home": {
     "meta": {
       "title": "DrugCard — AI-powered pharmacovigilance automation",
