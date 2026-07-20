@@ -26,6 +26,7 @@ const findFormBySlug = async (slug: string, locale: TypedLocale) => {
 // Named thunk factory (no inline lambda) closing over the query args.
 const loadForm = (slug: string, locale: TypedLocale) => () => findFormBySlug(slug, locale)
 
+
 // Forms are embedded in the statically-prerendered [locale] layout, so the
 // fetch is tag-cached exactly like getCachedGlobal. One revalidateTag(
 // `form_<slug>`) from the form's afterChange hook regenerates every locale of
