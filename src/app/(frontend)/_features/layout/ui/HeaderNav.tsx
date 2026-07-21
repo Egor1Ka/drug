@@ -2,10 +2,10 @@
 
 import React from 'react'
 
-import { CMSLink } from '@/components/Link'
 import type { Header } from '@/payload-types'
 
 import { NavDropdown } from './NavDropdown'
+import { NavItemLink } from './NavItemLink'
 
 export type HeaderNavItem = NonNullable<Header['navItems']>[number]
 
@@ -15,9 +15,9 @@ const NavEntry: React.FC<{ item: HeaderNavItem }> = ({ item }) => {
   if (hasSubItems(item)) return <NavDropdown item={item} />
 
   return (
-    <CMSLink
-      {...item.link}
+    <NavItemLink
       className="text-sm font-semibold text-foreground transition hover:text-primary"
+      link={item.link}
     />
   )
 }

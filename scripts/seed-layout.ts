@@ -34,6 +34,12 @@ const customLink = (label: string, url: string) => ({
   link: { label, type: 'custom' as const, url },
 })
 
+// A header nav parent with no URL: not a link itself, only opens its sub-menu
+// (matches «Solution»/«Resources» on the original site).
+const dropdownParent = (label: string) => ({
+  link: { label, type: 'custom' as const },
+})
+
 // ---------- Форма подписки ----------
 
 const NEWSLETTER_SLUG = 'newsletter'
@@ -129,7 +135,7 @@ const HEADER_EN = {
       ],
     },
     {
-      ...customLink('Solution', '/solution'),
+      ...dropdownParent('Solution'),
       subItems: [
         customLink('DrugCard Platform', '/local-literature'),
         customLink('Simple Search by DrugCard', '/simple-search'),
@@ -152,7 +158,7 @@ const HEADER_EN = {
       ],
     },
     {
-      ...customLink('Resources', '/resources'),
+      ...dropdownParent('Resources'),
       subItems: [
         customLink('Blog', '/blog'),
         customLink('Case Studies', '/case-studies'),
@@ -187,7 +193,7 @@ const HEADER_UK = {
       ],
     },
     {
-      ...customLink('Рішення', '/solution'),
+      ...dropdownParent('Рішення'),
       subItems: [
         customLink('Платформа DrugCard', '/local-literature'),
         customLink('Simple Search', '/simple-search'),
@@ -210,7 +216,7 @@ const HEADER_UK = {
       ],
     },
     {
-      ...customLink('Ресурси', '/resources'),
+      ...dropdownParent('Ресурси'),
       subItems: [
         customLink('Блог', '/blog'),
         customLink('Кейси', '/case-studies'),

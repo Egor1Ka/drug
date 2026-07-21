@@ -9,6 +9,7 @@ import { Show } from '@frontend/_shared/ui/Show'
 
 import type { HeaderNavItem } from './HeaderNav'
 import { LocaleSwitcher } from './LocaleSwitcher'
+import { NavItemLink } from './NavItemLink'
 import { RequestDemoButton } from './RequestDemoButton'
 
 type LoginLink = NonNullable<Header['ctaButtons']>['loginButton']
@@ -52,7 +53,7 @@ const MobileNavItem: React.FC<{ item: HeaderNavItem }> = ({ item }) => {
 
   return (
     <li className="border-b border-border py-3">
-      <CMSLink {...item.link} className="block font-semibold text-foreground" />
+      <NavItemLink className="block font-semibold text-foreground" link={item.link} />
       <Show when={subItems.length > 0}>
         <ul className="mt-1 pl-4">{subItems.map(toSubLink)}</ul>
       </Show>

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
+import { metaTab } from '@/fields/metaTab'
 import { FaqSection, LogosSection, StatsSection, TeamSection, TestimonialsSection } from './blocks'
 import { revalidatePageContent, revalidatePageContentDelete } from './hooks/revalidatePageContent'
 import { validateUniqueSectionKeys } from './validateUniqueSectionKeys'
@@ -22,23 +23,35 @@ export const PageContent: CollectionConfig<'page-content'> = {
   },
   fields: [
     {
-      name: 'pageKey',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      admin: {
-        description: "Route identifier: 'home' → /, otherwise /<pageKey> (e.g. 'pricing' → /pricing)",
-      },
-    },
-    {
-      name: 'sections',
-      type: 'blocks',
-      blocks: [FaqSection, TestimonialsSection, LogosSection, StatsSection, TeamSection],
-      validate: validateUniqueSectionKeys,
-      admin: {
-        initCollapsed: true,
-      },
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          fields: [
+            {
+              name: 'pageKey',
+              type: 'text',
+              required: true,
+              unique: true,
+              index: true,
+              admin: {
+                description:
+                  "Route identifier: 'home' → /, otherwise /<pageKey> (e.g. 'pricing' → /pricing)",
+              },
+            },
+            {
+              name: 'sections',
+              type: 'blocks',
+              blocks: [FaqSection, TestimonialsSection, LogosSection, StatsSection, TeamSection],
+              validate: validateUniqueSectionKeys,
+              admin: {
+                initCollapsed: true,
+              },
+            },
+          ],
+        },
+        metaTab,
+      ],
     },
   ],
   hooks: {

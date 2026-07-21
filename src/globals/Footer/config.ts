@@ -32,6 +32,7 @@ export const Footer: GlobalConfig = {
           fields: [
             link({
               appearances: false,
+              customOnly: true,
             }),
           ],
         },
@@ -91,6 +92,7 @@ export const Footer: GlobalConfig = {
           fields: [
             link({
               appearances: false,
+              customOnly: true,
             }),
           ],
         },

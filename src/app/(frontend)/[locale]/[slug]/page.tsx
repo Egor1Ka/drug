@@ -1,113 +1,21 @@
-import type { Metadata } from 'next'
-
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
-import { draftMode } from 'next/headers'
 import { setRequestLocale } from 'next-intl/server'
-import React, { cache } from 'react'
-import { homeStatic } from '@/endpoints/seed/home-static'
 
-import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { RenderHero } from '@/heros/RenderHero'
 import type { AppLocale } from '@/i18n/routing'
-import { generateMeta } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
-
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
-    })
-
-  return params
-}
 
 type Args = {
   params: Promise<{ locale: AppLocale; slug?: string }>
 }
 
-export default async function Page({ params: paramsPromise }: Args) {
-  const { locale, slug = 'home' } = await paramsPromise
+// Catch-all fallback: any path not served by a hand-coded route resolves a CMS
+// redirect if one exists, otherwise 404s. Hand-coded routes take precedence over
+// this dynamic segment, so it only ever handles unmatched paths.
+export default async function CatchAllRedirect({ params }: Args) {
+  const { locale, slug } = await params
 
   setRequestLocale(locale)
 
-  const { isEnabled: draft } = await draftMode()
-  // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
-  const url = '/' + decodedSlug
-  let page: RequiredDataFromCollectionSlug<'pages'> | null
+  const url = '/' + (slug ? decodeURIComponent(slug) : '')
 
-  page = await queryPageBySlug(decodedSlug, locale)
-
-  // Remove this code once your website is seeded
-  if (!page && slug === 'home') {
-    page = homeStatic
-  }
-
-  if (!page) {
-    return <PayloadRedirects url={url} />
-  }
-
-  const { hero, layout } = page
-
-  return (
-    <article className="pt-16 pb-24">
-      <PageClient />
-      {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
-
-      {draft && <LivePreviewListener />}
-
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
-    </article>
-  )
+  return <PayloadRedirects url={url} />
 }
-
-export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { locale, slug = 'home' } = await paramsPromise
-  // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
-  const page = await queryPageBySlug(decodedSlug, locale)
-
-  return generateMeta({ doc: page })
-}
-
-const queryPageBySlug = cache(async (slug: string, locale: AppLocale) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    locale,
-    pagination: false,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})

@@ -6,6 +6,7 @@ export {
   getTeamSection,
   getTestimonialsSection,
 } from './api/pageContent'
+export { buildPageMetadata } from './api/pageMetadata'
 
 export { FaqAccordion } from './ui/FaqAccordion'
 export { LogoCarousel } from './ui/LogoCarousel'

@@ -17,8 +17,12 @@ export const Header: GlobalConfig = {
       localized: true,
       maxRows: 8,
       fields: [
+        // Custom URL only. URL is optional: leave it blank to make the item a
+        // non-clickable parent that just opens its sub-menu (like «Solution»).
         link({
           appearances: false,
+          customOnly: true,
+          optionalURL: true,
         }),
         {
           name: 'subItems',
@@ -26,11 +30,12 @@ export const Header: GlobalConfig = {
           fields: [
             link({
               appearances: false,
+              customOnly: true,
             }),
           ],
           admin: {
             description:
-              'Заполните, чтобы пункт открывал выпадающее подменю. Сам пункт остаётся кликабельной ссылкой.',
+              'Заполните, чтобы пункт открывал выпадающее подменю. Если оставить URL пункта пустым — он станет некликабельным и будет только открывать это подменю.',
             initCollapsed: true,
           },
         },
@@ -48,6 +53,7 @@ export const Header: GlobalConfig = {
       fields: [
         link({
           appearances: false,
+          customOnly: true,
           overrides: {
             name: 'loginButton',
             // Группа локализована целиком: en может вести на /login/en,

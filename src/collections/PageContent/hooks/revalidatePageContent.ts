@@ -3,11 +3,9 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'paylo
 import { revalidatePath } from 'next/cache'
 
 import { routing } from '@/i18n/routing'
+import { pageKeyToPath } from '@/utilities/pageKeyToPath'
 
 import type { PageContent } from '../../../payload-types'
-
-// pageKey convention: 'home' → '/', anything else → '/<pageKey>'
-const pageKeyToPath = (pageKey: string) => (pageKey === 'home' ? '' : `/${pageKey}`)
 
 const revalidatePageForAllLocales = (pageKey: string) => {
   const toLocalizedPath = (locale: string) => `/${locale}${pageKeyToPath(pageKey)}`
