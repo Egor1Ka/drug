@@ -17,9 +17,12 @@ import {
   fetchAllCategories,
   fetchPublishedPostsPage,
 } from '@frontend/_features/blog'
+import { buildPageMetadata, fetchPageContent } from '@frontend/_features/page-content'
 import PageClient from './page.client'
 
 export const revalidate = 600
+
+const BLOG_PAGE_KEY = 'blog'
 
 type Args = {
   params: Promise<{ locale: AppLocale }>
@@ -82,8 +85,11 @@ export default async function Page({
   )
 }
 
-export function generateMetadata(): Metadata {
-  return {
-    title: 'Blog',
-  }
+export async function generateMetadata({ params }: Args): Promise<Metadata> {
+  const { locale } = await params
+
+  const content = await fetchPageContent(BLOG_PAGE_KEY, locale)
+  const fallback = { title: 'Blog', description: '' }
+
+  return buildPageMetadata(content, fallback)
 }
