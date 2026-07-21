@@ -115,5 +115,16 @@
       "scheduleMeeting": "Schedule a meeting",
       "requestDemo": "Request a demo"
     }
+  },
+  "Layout": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleSubmenu": "Toggle submenu",
+    "switchLanguage": "Switch language",
+    "newsletterPlaceholder": "Your email",
+    "newsletterSubmit": "Subscribe",
+    "newsletterSending": "Sending...",
+    "newsletterError": "Something went wrong. Please try again.",
+    "newsletterSuccess": "Thank you for subscribing!"
   }
 }

@@ -115,5 +115,16 @@
       "scheduleMeeting": "Запланувати зустріч",
       "requestDemo": "Запитати демо"
     }
+  },
+  "Layout": {
+    "openMenu": "Відкрити меню",
+    "closeMenu": "Закрити меню",
+    "toggleSubmenu": "Розгорнути підменю",
+    "switchLanguage": "Змінити мову",
+    "newsletterPlaceholder": "Ваш email",
+    "newsletterSubmit": "Підписатися",
+    "newsletterSending": "Надсилаємо...",
+    "newsletterError": "Щось пішло не так. Спробуйте ще раз.",
+    "newsletterSuccess": "Дякуємо за підписку!"
   }
 }

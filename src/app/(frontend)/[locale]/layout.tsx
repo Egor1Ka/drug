@@ -12,8 +12,7 @@ import React from 'react'
 import { AdminBar } from '@/components/AdminBar'
 import { ContactModalProvider } from '@frontend/_features/contact'
 import { fetchFormBySlug } from '@frontend/_features/forms'
-import { Footer } from '@/globals/Footer/Component'
-import { Header } from '@/globals/Header/Component'
+import { SiteFooter, SiteHeader } from '@frontend/_features/layout'
 import { routing, type AppLocale } from '@/i18n/routing'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
@@ -68,9 +67,9 @@ export default async function LocaleLayout({ children, params }: Args) {
                 }}
               />
 
-              <Header locale={locale} />
+              <SiteHeader locale={locale} />
               {children}
-              <Footer locale={locale} />
+              <SiteFooter locale={locale} />
             </ContactModalProvider>
           </Providers>
         </NextIntlClientProvider>
