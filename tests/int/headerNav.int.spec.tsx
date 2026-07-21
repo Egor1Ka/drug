@@ -29,6 +29,13 @@ const itemWithSubmenu: HeaderNavItem = {
   ],
 }
 
+// Parent with a submenu but NO url — a non-clickable dropdown parent.
+const dropdownOnlyParent: HeaderNavItem = {
+  id: '3',
+  link: { label: 'Resources', type: 'custom' },
+  subItems: [{ id: 's3', link: { label: 'Blog', type: 'custom', url: '/blog' } }],
+}
+
 describe('HeaderNav', () => {
   it('renders a plain item as a link without a submenu trigger', () => {
     renderNav([plainItem])
@@ -90,5 +97,18 @@ describe('HeaderNav', () => {
     const { container } = renderNav([])
 
     expect(container.querySelectorAll('a').length).toBe(0)
+  })
+
+  it('renders a url-less submenu parent as non-clickable text, still opening the submenu', async () => {
+    const user = userEvent.setup()
+    renderNav([dropdownOnlyParent])
+
+    // The parent label shows, but is NOT a link.
+    expect(screen.getByText('Resources')).toBeTruthy()
+    expect(screen.queryByRole('link', { name: 'Resources' })).toBeNull()
+
+    // The submenu still opens via the toggle.
+    await user.click(screen.getByRole('button', { name: /submenu/i }))
+    expect(screen.getByRole('link', { name: 'Blog' })).toBeTruthy()
   })
 })

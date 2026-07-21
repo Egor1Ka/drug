@@ -27,6 +27,12 @@ const toRichTextParagraph = (text: string) => ({
 
 const CONTACT_FORM_SLUG = 'contact-us'
 
+const HOME_META = {
+  title: 'DrugCard: Comprehensive Literature Screening & Pharmacovigilance Solutions',
+  description:
+    'DrugCard - AI-powered pharmacovigilance tools & services for automated literature monitoring, regulatory intelligence and adverse events management.',
+}
+
 const CONTACT_FORM_FIELDS = [
   { blockType: 'text', labels: { en: 'Name', uk: "Ім'я" }, name: 'name' },
   { blockType: 'text', labels: { en: 'Surname', uk: 'Прізвище' }, name: 'surname' },
@@ -391,7 +397,7 @@ const enrichHomeContent = async () => {
     await payload.create({
       collection: 'page-content',
       context: { disableRevalidate: true },
-      data: { pageKey: 'home', sections },
+      data: { pageKey: 'home', sections, meta: HOME_META },
       locale: 'en',
     })
     payload.logger.info(`Created page-content "home" (images: ${media ? 'attached' : 'skipped'})`)

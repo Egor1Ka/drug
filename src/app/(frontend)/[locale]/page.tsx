@@ -13,6 +13,7 @@ import {
   VideoEmbed,
 } from '@frontend/_features/home'
 import {
+  buildPageMetadata,
   FaqAccordion,
   fetchPageContent,
   getFaqSection,
@@ -103,8 +104,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'Home.meta' })
 
-  return {
-    description: t('description'),
-    title: t('title'),
-  }
+  const content = await fetchPageContent(HOME_PAGE_KEY, locale)
+  const fallback = { title: t('title'), description: t('description') }
+
+  return buildPageMetadata(content, fallback)
 }

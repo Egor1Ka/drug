@@ -9,17 +9,23 @@ import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
-import { Page, Post } from '@/payload-types'
+import { PageContent, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { pageKeyToPath } from '@/utilities/pageKeyToPath'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+const generateTitle: GenerateTitle<Post | PageContent> = ({ doc }) => {
+  const title = doc && 'title' in doc ? doc.title : undefined
+  return title ? `${title} | Payload Website Template` : 'Payload Website Template'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+const generateURL: GenerateURL<Post | PageContent> = ({ doc }) => {
   const url = getServerSideURL()
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  if (doc && 'pageKey' in doc && doc.pageKey) {
+    return `${url}${pageKeyToPath(doc.pageKey)}`
+  }
+
+  return doc && 'slug' in doc && doc.slug ? `${url}/${doc.slug}` : url
 }
 
 // Stable key the frontend references a form by (e.g. 'contact-us').
@@ -119,7 +125,7 @@ const revalidateForm: CollectionAfterChangeHook = ({ doc, req: { context, payloa
 
 export const plugins: Plugin[] = [
   redirectsPlugin({
-    collections: ['pages', 'posts'],
+    collections: ['posts'],
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {

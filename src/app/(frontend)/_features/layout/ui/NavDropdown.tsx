@@ -7,6 +7,7 @@ import { CMSLink } from '@/components/Link'
 import { cn } from '@/utilities/ui'
 
 import type { HeaderNavItem } from './HeaderNav'
+import { NavItemLink } from './NavItemLink'
 
 type SubItem = NonNullable<HeaderNavItem['subItems']>[number]
 
@@ -60,9 +61,9 @@ export const NavDropdown: React.FC<{ item: HeaderNavItem }> = ({ item }) => {
   return (
     <div className="group relative" onBlur={closeMenu} onKeyDown={handleKeyDown}>
       <span className="flex items-center gap-1">
-        <CMSLink
-          {...item.link}
+        <NavItemLink
           className="text-sm font-semibold text-foreground transition hover:text-primary"
+          link={item.link}
         />
         <button
           aria-expanded={isOpen}
