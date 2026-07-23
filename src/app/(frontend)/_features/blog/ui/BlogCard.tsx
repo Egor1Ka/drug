@@ -4,7 +4,6 @@ import React from 'react'
 import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatBlogDate } from '@/utilities/formatBlogDate'
 
 export type BlogCardPost = Pick<
@@ -12,13 +11,41 @@ export type BlogCardPost = Pick<
   'slug' | 'title' | 'heroImage' | 'meta' | 'publishedAt' | 'populatedAuthors'
 >
 
+type PopulatedAuthor = NonNullable<NonNullable<Post['populatedAuthors']>[number]>
+
+const hasName = (author: PopulatedAuthor) => Boolean(author.name)
+
+const AuthorName: React.FC<{ author: PopulatedAuthor }> = ({ author }) => {
+  if (!author.slug) return <span>{author.name}</span>
+
+  return (
+    <Link href={`/blog/author/${author.slug}`} className="hover:text-primary">
+      {author.name}
+    </Link>
+  )
+}
+
+const AuthorByline: React.FC<{ authors: PopulatedAuthor[] }> = ({ authors }) => {
+  const namedAuthors = authors.filter(hasName)
+
+  if (namedAuthors.length === 0) return null
+
+  const renderAuthor = (author: PopulatedAuthor, index: number) => (
+    <React.Fragment key={author.id || author.name}>
+      {index > 0 && ', '}
+      <AuthorName author={author} />
+    </React.Fragment>
+  )
+
+  return <span>{namedAuthors.map(renderAuthor)}</span>
+}
+
 export const BlogCard: React.FC<{ post: BlogCardPost }> = ({ post }) => {
   const { heroImage, meta, populatedAuthors, publishedAt, slug, title } = post
 
   const heroImageObject = heroImage && typeof heroImage === 'object' ? heroImage : null
   const metaImageObject = meta && meta.image && typeof meta.image === 'object' ? meta.image : null
   const image = heroImageObject || metaImageObject
-  const authors = formatAuthors(populatedAuthors || [])
   const href = `/blog/${slug}`
 
   return (
@@ -29,7 +56,7 @@ export const BlogCard: React.FC<{ post: BlogCardPost }> = ({ post }) => {
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           {publishedAt && <time dateTime={publishedAt}>{formatBlogDate(publishedAt)}</time>}
-          {authors && <span>{authors}</span>}
+          <AuthorByline authors={populatedAuthors || []} />
         </div>
         <h2 className="text-xl font-semibold leading-snug">
           <Link href={href} className="hover:text-primary">

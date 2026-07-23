@@ -9,17 +9,33 @@ import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
-import { PageContent, Post } from '@/payload-types'
+import { Author, News, PageContent, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { pageKeyToPath } from '@/utilities/pageKeyToPath'
 
-const generateTitle: GenerateTitle<Post | PageContent> = ({ doc }) => {
-  const title = doc && 'title' in doc ? doc.title : undefined
-  return title ? `${title} | Payload Website Template` : 'Payload Website Template'
+type SeoDoc = Author | News | PageContent | Post
+
+const getDocLabel = (doc?: SeoDoc) => {
+  if (doc && 'title' in doc && doc.title) return doc.title
+  if (doc && 'name' in doc && doc.name) return doc.name
+  return undefined
 }
 
-const generateURL: GenerateURL<Post | PageContent> = ({ doc }) => {
+const generateTitle: GenerateTitle<SeoDoc> = ({ doc }) => {
+  const label = getDocLabel(doc)
+  return label ? `${label} | Payload Website Template` : 'Payload Website Template'
+}
+
+const generateURL: GenerateURL<SeoDoc> = ({ collectionConfig, doc }) => {
   const url = getServerSideURL()
+
+  if (collectionConfig?.slug === 'authors' && doc && 'slug' in doc && doc.slug) {
+    return `${url}/blog/author/${doc.slug}`
+  }
+
+  if (collectionConfig?.slug === 'news' && doc && 'slug' in doc && doc.slug) {
+    return `${url}/news/${doc.slug}`
+  }
 
   if (doc && 'pageKey' in doc && doc.pageKey) {
     return `${url}${pageKeyToPath(doc.pageKey)}`

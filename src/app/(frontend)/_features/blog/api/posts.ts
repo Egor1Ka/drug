@@ -8,8 +8,11 @@ import type { Post } from '@/payload-types'
 export const POSTS_PER_PAGE = 12
 
 // Field set every blog card renders — single source for all listing queries.
+// `populatedAuthors` is denormalized by the Posts afterRead hook and carries the
+// byline name + slug the card links to, so it must be selected alongside `authors`.
 export const blogCardSelect = {
   authors: true,
+  populatedAuthors: true,
   categories: true,
   heroImage: true,
   meta: true,
@@ -70,6 +73,32 @@ export const fetchPostsByTag = async ({ locale, page, slug }: PostsByTagArgs) =>
     sort: '-publishedAt',
     where: {
       'tags.slug': {
+        equals: slug,
+      },
+    },
+  })
+}
+
+type PostsByAuthorArgs = {
+  locale: TypedLocale
+  page: number
+  slug: string
+}
+
+export const fetchPostsByAuthor = async ({ locale, page, slug }: PostsByAuthorArgs) => {
+  const payload = await getPayload({ config: configPromise })
+
+  return payload.find({
+    collection: 'posts',
+    depth: 1,
+    limit: POSTS_PER_PAGE,
+    locale,
+    overrideAccess: false,
+    page,
+    select: blogCardSelect,
+    sort: '-publishedAt',
+    where: {
+      'authors.slug': {
         equals: slug,
       },
     },

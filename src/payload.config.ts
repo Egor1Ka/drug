@@ -4,8 +4,11 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
+import { CaseStudies } from './collections/CaseStudies'
 import { Media } from './collections/Media'
+import { News } from './collections/News'
 import { PageContent } from './collections/PageContent'
 import { Posts } from './collections/Posts'
 import { Tags } from './collections/Tags'
@@ -61,7 +64,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
-  collections: [PageContent, Posts, Media, Categories, Tags, Users],
+  collections: [PageContent, Posts, News, CaseStudies, Media, Categories, Tags, Authors, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   // Locale list must match src/i18n/routing.ts (frontend routing source of truth)

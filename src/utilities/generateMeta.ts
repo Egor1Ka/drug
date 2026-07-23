@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { Media, Post, Config } from '../payload-types'
+import type { Media, News, Post, CaseStudy, Config } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
@@ -19,16 +19,23 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   return url
 }
 
+const BRAND = 'DrugCard'
+
 export const generateMeta = async (args: {
-  doc: Partial<Post> | null
+  doc: Partial<Post> | Partial<News> | Partial<CaseStudy> | null
+  url?: string
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, url } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+  // Prefer the editor-set SEO title, fall back to the document's own title,
+  // and only then to the bare brand — never leave a page titled just "DrugCard"
+  // when it has a real heading.
+  const contentTitle = doc?.meta?.title || (typeof doc?.title === 'string' ? doc.title : undefined)
+  const title = contentTitle ? `${contentTitle} | ${BRAND}` : BRAND
+
+  const serverUrl = getServerSideURL()
 
   return {
     description: doc?.meta?.description,
@@ -42,7 +49,7 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url: url ? serverUrl + url : serverUrl,
     }),
     title,
   }

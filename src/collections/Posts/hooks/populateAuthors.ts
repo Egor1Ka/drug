@@ -1,37 +1,40 @@
 import type { CollectionAfterReadHook } from 'payload'
-import { User } from 'src/payload-types'
+import { Author } from 'src/payload-types'
 
-// The `user` collection has access control locked so that users are not publicly accessible
-// This means that we need to populate the authors manually here to protect user privacy
-// GraphQL will not return mutated user data that differs from the underlying schema
-// So we use an alternative `populatedAuthors` field to populate the user data, hidden from the admin UI
-export const populateAuthors: CollectionAfterReadHook = async ({ doc, req, req: { payload } }) => {
-  if (doc?.authors && doc?.authors?.length > 0) {
-    const authorDocs: User[] = []
+// Denormalize each related author (id, name, slug) onto `populatedAuthors` so
+// blog cards render the byline and link to /blog/author/[slug] without an extra
+// relationship query per card. The `authors` collection is publicly readable,
+// so this is a convenience denormalization rather than a privacy workaround.
+const toAuthorId = (author: Author | string) =>
+  typeof author === 'object' ? author?.id : author
 
-    for (const author of doc.authors) {
-      try {
-        const authorDoc = await payload.findByID({
-          id: typeof author === 'object' ? author?.id : author,
-          collection: 'users',
-          depth: 0,
-        })
+const toPopulatedAuthor = (author: Author) => ({
+  id: author.id,
+  name: author.name,
+  slug: author.slug,
+})
 
-        if (authorDoc) {
-          authorDocs.push(authorDoc)
-        }
+const isAuthor = (author: Author | null): author is Author => Boolean(author)
 
-        if (authorDocs.length > 0) {
-          doc.populatedAuthors = authorDocs.map((authorDoc) => ({
-            id: authorDoc.id,
-            name: authorDoc.name,
-          }))
-        }
-      } catch {
-        // swallow error
-      }
+export const populateAuthors: CollectionAfterReadHook = async ({ doc, req: { payload } }) => {
+  if (!doc || !doc.authors || doc.authors.length === 0) return doc
+
+  const fetchAuthor = async (author: Author | string): Promise<Author | null> => {
+    try {
+      return await payload.findByID({
+        id: toAuthorId(author),
+        collection: 'authors',
+        depth: 0,
+      })
+    } catch {
+      // A missing author must never break post reads.
+      return null
     }
   }
+
+  const authorDocs = await Promise.all(doc.authors.map(fetchAuthor))
+
+  doc.populatedAuthors = authorDocs.filter(isAuthor).map(toPopulatedAuthor)
 
   return doc
 }

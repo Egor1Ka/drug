@@ -217,11 +217,11 @@ export const Posts: CollectionConfig<'posts'> = {
         position: 'sidebar',
       },
       hasMany: true,
-      relationTo: 'users',
+      relationTo: 'authors',
     },
-    // This field is only used to populate the user data via the `populateAuthors` hook
-    // This is because the `user` collection has access control locked to protect user privacy
-    // GraphQL will also not return mutated user data that differs from the underlying schema
+    // Flattened author data (id, name, slug) denormalized onto the post by the
+    // `populateAuthors` hook, so blog cards render the byline and link to
+    // /blog/author/[slug] without a second relationship query per card.
     {
       name: 'populatedAuthors',
       type: 'array',
@@ -239,6 +239,10 @@ export const Posts: CollectionConfig<'posts'> = {
         },
         {
           name: 'name',
+          type: 'text',
+        },
+        {
+          name: 'slug',
           type: 'text',
         },
       ],
