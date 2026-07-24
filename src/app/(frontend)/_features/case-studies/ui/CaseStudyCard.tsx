@@ -4,7 +4,7 @@ import React from 'react'
 import type { CaseStudy } from '@/payload-types'
 
 import { Show } from '@frontend/_shared/ui/Show'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 
 export type CaseStudyCardItem = Pick<
   CaseStudy,
@@ -37,7 +37,7 @@ export const CaseStudyCard: React.FC<{ item: CaseStudyCardItem }> = ({ item }) =
 
       <Show when={publishedAt}>
         <time className="text-sm text-muted-foreground" dateTime={publishedAt || undefined}>
-          {publishedAt && formatBlogDate(publishedAt)}
+          {publishedAt && formatPublishedDate(publishedAt)}
         </time>
       </Show>
 

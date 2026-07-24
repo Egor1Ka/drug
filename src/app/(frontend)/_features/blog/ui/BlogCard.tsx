@@ -4,7 +4,7 @@ import React from 'react'
 import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 
 export type BlogCardPost = Pick<
   Post,
@@ -55,7 +55,7 @@ export const BlogCard: React.FC<{ post: BlogCardPost }> = ({ post }) => {
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          {publishedAt && <time dateTime={publishedAt}>{formatBlogDate(publishedAt)}</time>}
+          {publishedAt && <time dateTime={publishedAt}>{formatPublishedDate(publishedAt)}</time>}
           <AuthorByline authors={populatedAuthors || []} />
         </div>
         <h2 className="text-xl font-semibold leading-snug">

@@ -1,4 +1,4 @@
-export const formatBlogDate = (timestamp: string): string => {
+export const formatPublishedDate = (timestamp: string): string => {
   const date = new Date(timestamp)
   const day = String(date.getUTCDate()).padStart(2, '0')
   const month = String(date.getUTCMonth() + 1).padStart(2, '0')

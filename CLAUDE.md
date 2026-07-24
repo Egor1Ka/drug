@@ -32,7 +32,7 @@ src/app/(frontend)/
   blog/            ← thin route files only: page.tsx, [slug]/, tag/[slug]/, page/[pageNumber]/
 ```
 
-- **Public API rule:** routes import ONLY from the feature root (`@frontend/_features/blog`) — never from `ui/` or `api/` internals. `index.ts` controls what the feature exposes.
+- **Public API rule:** routes import ONLY from the feature root (`@frontend/_features/blog`) — never from `ui/` or `api/` internals. `index.ts` controls what the feature exposes. When a feature mixes server-only exports (Payload Local API) with client code, it exposes a SECOND sanctioned entry `client.ts` (`@frontend/_features/forms/client`) with the client-safe subset — client components import from there so server-only modules never enter the client bundle; deep imports into internals stay forbidden.
 - **Inside a feature**, files import siblings relatively (`./BlogCard`, `../api/posts`).
 - **Where a thing belongs:** feature-specific → `_features/<feature>/`; reusable across frontend features with no business meaning → `_shared/`; used by BOTH the frontend and the Payload admin/template (e.g. `Media`, `RichText`, `Link`, `Card`, `ui/`) → stays in `src/components/`. A component starts inside its feature; promote it only when a SECOND consumer actually appears — not in advance.
 - Flat files (`BlogCard.tsx`), no `index.tsx`-per-folder nesting.
@@ -53,3 +53,13 @@ All Payload Local API access lives in the owning feature's `api/<collection>.ts`
 4. **Request-deduped lookups wrap in React `cache()` with primitive args** (`fetchPostBySlug(slug)`, not `({ slug })`) so the page render and `generateMetadata` share one DB hit — `cache` memoizes by reference, object args defeat it.
 5. **Pages are containers**: they validate params with guard clauses, compose queries (keep `Promise.all` visible so parallelism is explicit), and hand plain data to presentational components.
 6. **Self-contained widgets follow the pair pattern**: a `fetchXxx` query + a dumb component (`fetchSimilarPosts` + `SimilarPosts`); the parent decides visibility with `<Show when={...}>`.
+
+## Payload Form Builder conventions
+
+Any component that renders a Payload Form Builder form (a `Form` relationship pulled from Payload) is fully driven by the form's admin configuration — NEVER hardcode strings that duplicate a form setting.
+
+1. **Success state renders `form.confirmationMessage`** through `RichText` (the canonical pattern lives in `src/app/(frontend)/_features/forms/ui/FormRenderer.tsx`), guarded with `<Show when={state === 'success' && !!form.confirmationMessage}>`. Never substitute a hardcoded/translated success string.
+2. **Honor `form.confirmationType === 'redirect'`** + `form.redirect.url` instead of showing a message.
+3. **Submit button label comes from `form.submitButtonLabel`** first; a translation is only a fallback when the editor left it empty.
+4. **Field names come from the form** (`field.name`), never hardcoded — otherwise the submission targets a non-existent field.
+5. **Only pure UI-state strings with NO form equivalent** may come from `messages/*.json`: input placeholder, "sending…" label, generic network-error text.

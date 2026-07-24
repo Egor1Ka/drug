@@ -64,7 +64,6 @@ export default async function Page({
 
       <BlogListingLayout.Meta>
         <PageRange
-          collection="posts"
           currentPage={posts.page}
           limit={POSTS_PER_PAGE}
           totalDocs={posts.totalDocs}

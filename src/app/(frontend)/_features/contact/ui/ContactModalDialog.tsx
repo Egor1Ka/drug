@@ -5,9 +5,7 @@ import { useTranslations } from 'next-intl'
 import React, { useEffect } from 'react'
 
 import type { Form } from '@/payload-types'
-// Deep import on purpose: the forms barrel also exports the server-only
-// fetchFormBySlug (payload + node:fs), which must not enter the client bundle.
-import { FormRenderer } from '@frontend/_features/forms/ui/FormRenderer'
+import { FormRenderer } from '@frontend/_features/forms/client'
 
 type ContactModalDialogProps = {
   form: Form | null

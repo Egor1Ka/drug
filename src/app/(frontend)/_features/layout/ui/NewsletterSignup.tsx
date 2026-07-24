@@ -1,71 +1,35 @@
 'use client'
 
+import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import { useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import React from 'react'
 
+import RichText from '@/components/RichText'
 import type { Form } from '@/payload-types'
+import { findEmailFieldName, useFormSubmission } from '@frontend/_features/forms/client'
 import { Show } from '@frontend/_shared/ui/Show'
 
-type FormFieldBlock = NonNullable<Form['fields']>[number]
-type SubmissionState = 'idle' | 'sending' | 'success' | 'error'
-
-const isEmailField = (field: FormFieldBlock) => field.blockType === 'email'
-
-// Имя email-поля задаёт редактор в админке, поэтому берём его из формы,
-// а не хардкодим — иначе сабмит уйдёт в несуществующее поле.
-export const findEmailFieldName = (form: Form) => {
-  const fields = form.fields || []
-  const emailField = fields.find(isEmailField)
-
-  if (!emailField) return null
-
-  return emailField.name
-}
-
-type NewsletterSignupProps = {
-  form: Form | null
+type NewsletterFormProps = {
+  emailFieldName: string
+  form: Form
   heading?: string | null
 }
 
-export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ form, heading }) => {
+// Чистый view: вся логика сабмита живёт в useFormSubmission (фича forms),
+// компонент только рендерит состояние.
+const NewsletterForm: React.FC<NewsletterFormProps> = ({ emailFieldName, form, heading }) => {
   const t = useTranslations('Layout')
-  const [state, setState] = useState<SubmissionState>('idle')
-
-  if (!form) return null
-
-  const emailFieldName = findEmailFieldName(form)
-
-  const submitEmail = async (email: string) => {
-    setState('sending')
-
-    try {
-      const response = await fetch('/api/form-submissions', {
-        body: JSON.stringify({
-          form: form.id,
-          submissionData: [{ field: emailFieldName, value: email }],
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-
-      setState(response.ok ? 'success' : 'error')
-    } catch {
-      setState('error')
-    }
-  }
+  const { state, submit } = useFormSubmission(form)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
-    void submitEmail(String(formData.get('email') || ''))
+    void submit([{ field: emailFieldName, value: String(formData.get('email') || '') }])
   }
 
   const submitLabel = form.submitButtonLabel || t('newsletterSubmit')
   const buttonLabel = state === 'sending' ? t('newsletterSending') : submitLabel
-
-  // Форма без email-поля не может быть отправлена — блок не рендерим.
-  if (!emailFieldName) return null
 
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -73,8 +37,14 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ form, headin
         <p className="max-w-sm text-sm font-semibold text-white">{heading}</p>
       </Show>
 
-      <Show when={state === 'success'}>
-        <p className="text-sm text-white">{t('newsletterSuccess')}</p>
+      <Show when={state === 'success' && !!form.confirmationMessage}>
+        <div className="text-sm text-white">
+          <RichText
+            data={form.confirmationMessage as DefaultTypedEditorState}
+            enableGutter={false}
+            enableProse={false}
+          />
+        </div>
       </Show>
 
       <Show when={state !== 'success'}>
@@ -103,4 +73,20 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ form, headin
       </Show>
     </div>
   )
+}
+
+type NewsletterSignupProps = {
+  form: Form | null
+  heading?: string | null
+}
+
+// Guard-обёртка без хуков: форма без email-поля не может быть отправлена,
+// поэтому блок не рендерим вовсе.
+export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ form, heading }) => {
+  if (!form) return null
+
+  const emailFieldName = findEmailFieldName(form)
+  if (!emailFieldName) return null
+
+  return <NewsletterForm emailFieldName={emailFieldName} form={form} heading={heading} />
 }

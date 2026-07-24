@@ -1,7 +1,7 @@
 'use client'
 
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
-import React, { useState } from 'react'
+import React from 'react'
 
 import RichText from '@/components/RichText'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -11,13 +11,14 @@ import { Textarea } from '@/components/ui/textarea'
 import type { Form } from '@/payload-types'
 import { Show } from '@frontend/_shared/ui/Show'
 
+import { buildSubmissionData } from '../helpers/fields'
+import { useFormSubmission } from '../hooks/useFormSubmission'
+
 type FormFieldBlock = NonNullable<Form['fields']>[number]
 type FieldOfType<BlockType extends FormFieldBlock['blockType']> = Extract<
   FormFieldBlock,
   { blockType: BlockType }
 >
-
-type SubmissionState = 'idle' | 'sending' | 'success' | 'error'
 
 const DEFAULT_SUBMIT_LABEL = 'Send'
 const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please try again.'
@@ -132,14 +133,6 @@ const FormField: React.FC<{ field: FormFieldBlock }> = ({ field }) => {
   return <FieldControl field={field} />
 }
 
-const toSubmissionEntry = ([field, value]: [string, FormDataEntryValue]) => ({
-  field,
-  value: String(value),
-})
-
-const buildSubmissionData = (formData: FormData) =>
-  Array.from(formData.entries()).map(toSubmissionEntry)
-
 type FormRendererProps = {
   errorMessage?: string
   form: Form
@@ -151,30 +144,11 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
   form,
   submittingLabel,
 }) => {
-  const [state, setState] = useState<SubmissionState>('idle')
-
-  const submitForm = async (formData: FormData) => {
-    setState('sending')
-
-    try {
-      const response = await fetch('/api/form-submissions', {
-        body: JSON.stringify({
-          form: form.id,
-          submissionData: buildSubmissionData(formData),
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-
-      setState(response.ok ? 'success' : 'error')
-    } catch {
-      setState('error')
-    }
-  }
+  const { state, submit } = useFormSubmission(form)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    void submitForm(new FormData(event.currentTarget))
+    void submit(buildSubmissionData(new FormData(event.currentTarget)))
   }
 
   const fields = form.fields || []

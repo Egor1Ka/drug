@@ -4,7 +4,7 @@ import React from 'react'
 import type { News } from '@/payload-types'
 
 import { Show } from '@frontend/_shared/ui/Show'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 
 export type NewsCardItem = Pick<News, 'slug' | 'title' | 'excerpt' | 'publishedAt'>
 
@@ -16,7 +16,7 @@ export const NewsCard: React.FC<{ item: NewsCardItem }> = ({ item }) => {
     <article className="flex flex-col gap-3 py-8">
       <Show when={publishedAt}>
         <time className="text-sm text-muted-foreground" dateTime={publishedAt || undefined}>
-          {publishedAt && formatBlogDate(publishedAt)}
+          {publishedAt && formatPublishedDate(publishedAt)}
         </time>
       </Show>
 

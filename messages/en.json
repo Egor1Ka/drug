@@ -124,7 +124,6 @@
     "newsletterPlaceholder": "Your email",
     "newsletterSubmit": "Subscribe",
     "newsletterSending": "Sending...",
-    "newsletterError": "Something went wrong. Please try again.",
-    "newsletterSuccess": "Thank you for subscribing!"
+    "newsletterError": "Something went wrong. Please try again."
   }
 }

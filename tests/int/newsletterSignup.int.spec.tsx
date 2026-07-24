@@ -4,15 +4,58 @@ import { NextIntlClientProvider } from 'next-intl'
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  findEmailFieldName,
-  NewsletterSignup,
-} from '@frontend/_features/layout/ui/NewsletterSignup'
+import { findEmailFieldName } from '@frontend/_features/forms/client'
+import { NewsletterSignup } from '@frontend/_features/layout/ui/NewsletterSignup'
 import type { Form } from '@/payload-types'
+
+// Реальный RichText тянет @payloadcms/ui (scss) — jsdom его не переварит.
+// Тест проверяет поведение формы, а не lexical-рендеринг, поэтому мокаем
+// компонент простым рендером текстовых узлов дерева. Фабрика vi.mock
+// хоистится, поэтому она самодостаточна — без ссылок на внешние переменные.
+vi.mock('@/components/RichText', () => {
+  type LexicalNode = { children?: LexicalNode[]; text?: string }
+
+  const collectLexicalText = (node: LexicalNode): string => {
+    const ownText = node.text || ''
+    const childTexts = (node.children || []).map(collectLexicalText)
+
+    return ownText + childTexts.join('')
+  }
+
+  const RichTextMock = ({ data }: { data: { root: LexicalNode } }) => (
+    <div>{collectLexicalText(data.root)}</div>
+  )
+
+  return { default: RichTextMock }
+})
 
 afterEach(cleanup)
 
+// Success-текст задаёт редактор в админке (confirmationMessage формы),
+// поэтому в фикстуре — lexical-документ, а не строка из переводов.
+const confirmationMessage = {
+  root: {
+    children: [
+      {
+        children: [{ text: 'Thanks! Check your inbox.', type: 'text', version: 1 }],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'paragraph',
+        version: 1,
+      },
+    ],
+    direction: null,
+    format: '',
+    indent: 0,
+    type: 'root',
+    version: 1,
+  },
+}
+
 const form = {
+  confirmationMessage,
+  confirmationType: 'message',
   fields: [
     { blockType: 'text', id: 'f0', name: 'firstName', required: false },
     { blockType: 'email', id: 'f1', name: 'email', required: true },
@@ -28,7 +71,6 @@ const MESSAGES = {
     newsletterPlaceholder: 'Your email',
     newsletterSending: 'Sending...',
     newsletterSubmit: 'Subscribe',
-    newsletterSuccess: 'Thank you for subscribing!',
   },
 }
 
@@ -79,7 +121,8 @@ describe('NewsletterSignup', () => {
       submissionData: [{ field: 'email', value: 'a@b.com' }],
     })
 
-    await waitFor(() => expect(screen.getByText('Thank you for subscribing!')).toBeTruthy())
+    // Success-текст пришёл из confirmationMessage формы, а не из переводов.
+    await waitFor(() => expect(screen.getByText('Thanks! Check your inbox.')).toBeTruthy())
 
     vi.unstubAllGlobals()
   })

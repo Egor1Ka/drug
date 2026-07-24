@@ -18,7 +18,7 @@ import {
   fetchAllCaseStudySlugs,
   fetchCaseStudyBySlug,
 } from '@frontend/_features/case-studies'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 
@@ -50,7 +50,7 @@ export default async function CaseStudyItem({ params: paramsPromise }: Args) {
   if (!item) return <PayloadRedirects url={url} />
 
   const hasContent = Boolean(item.content)
-  const publishedDate = item.publishedAt ? formatBlogDate(item.publishedAt) : null
+  const publishedDate = item.publishedAt ? formatPublishedDate(item.publishedAt) : null
   const coverImage =
     item.coverImage && typeof item.coverImage === 'object' ? item.coverImage : null
 

@@ -1,57 +1,35 @@
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
-const defaultLabels = {
-  plural: 'Docs',
-  singular: 'Doc',
-}
+import { cn } from '@/utilities/ui'
 
-const defaultCollectionLabels = {
-  posts: {
-    plural: 'Posts',
-    singular: 'Post',
-  },
-}
-
-export const PageRange: React.FC<{
+type PageRangeProps = {
   className?: string
-  collection?: keyof typeof defaultCollectionLabels
-  collectionLabels?: {
-    plural?: string
-    singular?: string
-  }
   currentPage?: number
   limit?: number
   totalDocs?: number
-}> = (props) => {
-  const {
-    className,
-    collection,
-    collectionLabels: collectionLabelsFromProps,
-    currentPage,
-    limit,
-    totalDocs,
-  } = props
+}
 
-  let indexStart = (currentPage ? currentPage - 1 : 1) * (limit || 1) + 1
-  if (totalDocs && indexStart > totalDocs) indexStart = 0
+// Текст диапазона (и plural-формы) живёт в messages/*.json — Blog.showingRange
+// и Blog.noResults, а не в компоненте.
+export const PageRange: React.FC<PageRangeProps> = ({
+  className,
+  currentPage,
+  limit,
+  totalDocs,
+}) => {
+  const t = useTranslations('Blog')
 
-  let indexEnd = (currentPage || 1) * (limit || 1)
-  if (totalDocs && indexEnd > totalDocs) indexEnd = totalDocs
+  if (!totalDocs) return <div className={cn(className, 'font-semibold')}>{t('noResults')}</div>
 
-  const { plural, singular } =
-    collectionLabelsFromProps ||
-    (collection ? defaultCollectionLabels[collection] : undefined) ||
-    defaultLabels ||
-    {}
+  const page = currentPage || 1
+  const perPage = limit || 1
+  const from = Math.min((page - 1) * perPage + 1, totalDocs)
+  const to = Math.min(page * perPage, totalDocs)
 
   return (
-    <div className={[className, 'font-semibold'].filter(Boolean).join(' ')}>
-      {(typeof totalDocs === 'undefined' || totalDocs === 0) && 'Search produced no results.'}
-      {typeof totalDocs !== 'undefined' &&
-        totalDocs > 0 &&
-        `Showing ${indexStart}${indexStart > 0 ? ` - ${indexEnd}` : ''} of ${totalDocs} ${
-          totalDocs > 1 ? plural : singular
-        }`}
+    <div className={cn(className, 'font-semibold')}>
+      {t('showingRange', { from, to, total: totalDocs })}
     </div>
   )
 }

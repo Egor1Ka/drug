@@ -1,7 +1,7 @@
 import type { TypedLocale } from 'payload'
 import React from 'react'
 
-import type { Form } from '@/payload-types'
+import { resolveRelation } from '@/utilities/resolveRelation'
 import { Show } from '@frontend/_shared/ui/Show'
 
 import { fetchFooterData } from '../api/footer'
@@ -12,22 +12,15 @@ import { FooterLinkColumns } from './FooterLinkColumns'
 import { FooterSocials } from './FooterSocials'
 import { NewsletterSignup } from './NewsletterSignup'
 
-// depth 1 отдаёт связанную форму объектом; строка означает, что документ
-// не разрешился (форма удалена) — блок подписки тогда не рендерим.
-const resolveNewsletterForm = (form: string | Form | null | undefined): Form | null => {
-  if (!form) return null
-  if (typeof form === 'string') return null
-
-  return form
-}
-
 export const SiteFooter = async ({ locale }: { locale: TypedLocale }) => {
   const footer = await fetchFooterData(locale)
 
   const linkColumns = footer?.linkColumns || []
   const socials = footer?.socials || []
   const newsletter = footer?.newsletter
-  const newsletterForm = resolveNewsletterForm(newsletter ? newsletter.form : null)
+  // depth 1 отдаёт связанную форму объектом; неразрешённый relationship
+  // (форма удалена) — блок подписки тогда не рендерим.
+  const newsletterForm = resolveRelation(newsletter ? newsletter.form : null)
 
   return (
     <FooterLayout>

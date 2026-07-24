@@ -23,7 +23,7 @@ import {
   type Crumb,
 } from '@frontend/_features/blog'
 import { calculateReadTime } from '@/utilities/readTime'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 
@@ -75,7 +75,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   // Pre-localization documents may miss the localized content — never crash the build on it
   const hasContent = Boolean(post.content)
   const readTime = hasContent ? calculateReadTime(post.content) : null
-  const publishedDate = post.publishedAt ? formatBlogDate(post.publishedAt) : null
+  const publishedDate = post.publishedAt ? formatPublishedDate(post.publishedAt) : null
   const heroImage = post.heroImage && typeof post.heroImage === 'object' ? post.heroImage : null
   const tags = post.tags || []
   const similarPosts = await fetchSimilarPosts(post, locale)

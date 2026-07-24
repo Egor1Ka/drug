@@ -12,7 +12,7 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import RichText from '@/components/RichText'
 import { Show } from '@frontend/_shared/ui/Show'
 import { NewsPostLayout, fetchAllNewsSlugs, fetchNewsBySlug } from '@frontend/_features/news'
-import { formatBlogDate } from '@/utilities/formatBlogDate'
+import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 
@@ -44,7 +44,7 @@ export default async function NewsItem({ params: paramsPromise }: Args) {
   if (!item) return <PayloadRedirects url={url} />
 
   const hasContent = Boolean(item.content)
-  const publishedDate = item.publishedAt ? formatBlogDate(item.publishedAt) : null
+  const publishedDate = item.publishedAt ? formatPublishedDate(item.publishedAt) : null
   const coverImage =
     item.coverImage && typeof item.coverImage === 'object' ? item.coverImage : null
 

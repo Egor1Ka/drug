@@ -2,8 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { Post, Tag } from '@/payload-types'
-
-const isTagObject = (tag: Tag | string): tag is Tag => typeof tag === 'object'
+import { isResolvedRelation } from '@/utilities/resolveRelation'
 
 const renderChip = (tag: Tag) => (
   <Link
@@ -16,7 +15,7 @@ const renderChip = (tag: Tag) => (
 )
 
 export const TagChips: React.FC<{ tags: NonNullable<Post['tags']> }> = ({ tags }) => {
-  const tagObjects = tags.filter(isTagObject)
+  const tagObjects = tags.filter(isResolvedRelation<Tag>)
 
   if (tagObjects.length === 0) return null
 
