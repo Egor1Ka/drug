@@ -7,7 +7,10 @@ import type { Author } from '../../../payload-types'
 const revalidateAuthorPath = (slug?: string | null) => {
   if (!slug) return
 
-  revalidatePath(`/blog/author/${slug}`)
+  // Route pattern covers every locale; an unprefixed literal path would miss
+  // the actually cached /en/... and /uk/... pages.
+  revalidatePath('/[locale]/blog/author/[slug]', 'page')
+  revalidatePath('/[locale]/blog/[slug]', 'page')
   revalidateTag('authors-sitemap', 'max')
 }
 

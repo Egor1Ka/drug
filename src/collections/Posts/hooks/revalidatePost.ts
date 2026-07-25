@@ -4,10 +4,16 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 
 import type { Post } from '../../../payload-types'
 
-const revalidateBlogListing = () => {
-  revalidatePath('/blog')
-  revalidatePath('/blog/page/[pageNumber]', 'page')
-  revalidatePath('/blog/tag/[slug]', 'page')
+// Routes live under /[locale]/... — revalidating by the route PATTERN clears
+// every locale and every slug at once; an unprefixed literal ("/blog/x")
+// matches nothing and silently leaves stale pages cached.
+const revalidateBlogPages = () => {
+  revalidatePath('/[locale]/blog', 'page')
+  revalidatePath('/[locale]/blog/[slug]', 'page')
+  revalidatePath('/[locale]/blog/page/[pageNumber]', 'page')
+  revalidatePath('/[locale]/blog/tag/[slug]', 'page')
+  revalidatePath('/[locale]/blog/author/[slug]', 'page')
+  revalidateTag('posts-sitemap', 'max')
 }
 
 export const revalidatePost: CollectionAfterChangeHook<Post> = ({
@@ -15,39 +21,23 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
   previousDoc,
   req: { payload, context },
 }) => {
-  if (!context.disableRevalidate) {
-    if (doc._status === 'published') {
-      const path = `/blog/${doc.slug}`
+  if (context.disableRevalidate) return doc
 
-      payload.logger.info(`Revalidating post at path: ${path}`)
+  const wasPublished = previousDoc?._status === 'published'
+  const isPublished = doc._status === 'published'
 
-      revalidatePath(path)
-      revalidateBlogListing()
-      revalidateTag('posts-sitemap', 'max')
-    }
-
-    // If the post was previously published, we need to revalidate the old path
-    if (previousDoc._status === 'published' && doc._status !== 'published') {
-      const oldPath = `/blog/${previousDoc.slug}`
-
-      payload.logger.info(`Revalidating old post at path: ${oldPath}`)
-
-      revalidatePath(oldPath)
-      revalidateBlogListing()
-      revalidateTag('posts-sitemap', 'max')
-    }
+  if (isPublished || wasPublished) {
+    payload.logger.info(`Revalidating blog pages after change of post "${doc.slug}"`)
+    revalidateBlogPages()
   }
+
   return doc
 }
 
 export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { context } }) => {
-  if (!context.disableRevalidate) {
-    const path = `/blog/${doc?.slug}`
+  if (context.disableRevalidate) return doc
 
-    revalidatePath(path)
-    revalidateBlogListing()
-    revalidateTag('posts-sitemap', 'max')
-  }
+  revalidateBlogPages()
 
   return doc
 }

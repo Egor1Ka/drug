@@ -22,6 +22,10 @@ import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 
+// Safety net: even if a revalidation hook misses, the page refreshes within
+// 10 minutes instead of staying stale forever.
+export const revalidate = 600
+
 type Args = {
   params: Promise<{
     locale: AppLocale
