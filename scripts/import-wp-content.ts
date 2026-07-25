@@ -240,25 +240,34 @@ const createImageUploader =
       return null
     }
 
-    const createMediaDocument = async () => {
+    const createMediaDocument = async (name: string) => {
       const data = await fetchImageBuffer(url)
       const created = await payload.create({
         collection: 'media',
         data: { alt },
-        file: { data, mimetype: mimetypeFromUrl(url), name: filename, size: data.length },
+        file: { data, mimetype: mimetypeFromUrl(url), name, size: data.length },
       })
       return String(created.id)
     }
 
     try {
-      return await createMediaDocument()
+      return await createMediaDocument(filename)
     } catch (firstError) {
-      // Mongo Atlas occasionally aborts the media transaction ("Please retry
-      // your operation") — one delayed retry clears it.
-      payload.logger.warn(`Cover upload failed, retrying once: ${String(firstError)}`)
+      // Two known failure modes: Mongo Atlas transiently aborting the
+      // transaction ("Please retry your operation") — a delayed retry clears
+      // it — and Vercel Blob refusing to overwrite a file that an earlier run
+      // (e.g. against another DB sharing the same Blob store) already
+      // uploaded — retrying under a different name sidesteps it.
+      const isDuplicateBlob = String(firstError).includes('blob already exists')
+      const retryFilename = isDuplicateBlob
+        ? filename.replace(/(\.[a-z]+)$/i, '-wp$1')
+        : filename
+
+      payload.logger.warn(`Cover upload failed, retrying as "${retryFilename}": ${String(firstError)}`)
       await new Promise(scheduleRetryDelay)
+
       try {
-        return await createMediaDocument()
+        return await createMediaDocument(retryFilename)
       } catch (retryError) {
         // A missing cover must not sink the whole import — create the doc bare.
         payload.logger.warn(`Cover upload failed again, continuing without it: ${String(retryError)}`)

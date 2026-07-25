@@ -26,6 +26,8 @@ src/app/(frontend)/
       ui/          ← components: BlogCard.tsx, BlogArchive.tsx, CategoryTabs.tsx,
                      BlogListingLayout.tsx, BlogPostLayout.tsx, TagChips.tsx,
                      SimilarPosts.tsx, Breadcrumbs.tsx, Pagination.tsx, PageRange.tsx
+      lib/         ← pure presentation logic, no data access and no JSX:
+                     paginationTokens.ts (view-model for Pagination)
       index.ts     ← PUBLIC API of the feature (re-exports)
   _shared/
     ui/            ← frontend-only primitives with no business meaning: Show.tsx
@@ -35,6 +37,7 @@ src/app/(frontend)/
 - **Public API rule:** routes import ONLY from the feature root (`@frontend/_features/blog`) — never from `ui/` or `api/` internals. `index.ts` controls what the feature exposes. When a feature mixes server-only exports (Payload Local API) with client code, it exposes a SECOND sanctioned entry `client.ts` (`@frontend/_features/forms/client`) with the client-safe subset — client components import from there so server-only modules never enter the client bundle; deep imports into internals stay forbidden.
 - **Inside a feature**, files import siblings relatively (`./BlogCard`, `../api/posts`).
 - **Where a thing belongs:** feature-specific → `_features/<feature>/`; reusable across frontend features with no business meaning → `_shared/`; used by BOTH the frontend and the Payload admin/template (e.g. `Media`, `RichText`, `Link`, `Card`, `ui/`) → stays in `src/components/`. A component starts inside its feature; promote it only when a SECOND consumer actually appears — not in advance.
+- **Inside a feature, layers stay pure:** `api/` = data access only, `ui/` = dumb rendering only, `lib/` = pure functions (view-models, formatters) with no data access and no JSX. Logic extracted from a component goes to `lib/`, never stays next to the JSX.
 - Flat files (`BlogCard.tsx`), no `index.tsx`-per-folder nesting.
 
 ### Adding a new feature (checklist)

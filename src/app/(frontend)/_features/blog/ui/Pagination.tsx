@@ -12,6 +12,8 @@ import { cn } from '@/utilities/ui'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
+import { buildPageTokens, type PageToken } from '../lib/paginationTokens'
+
 const DEFAULT_HREF_PATTERN = '/blog/page/{page}'
 
 export const Pagination: React.FC<{
@@ -26,12 +28,27 @@ export const Pagination: React.FC<{
   const hasNextPage = page < totalPages
   const hasPrevPage = page > 1
 
-  const hasExtraPrevPages = page - 1 > 1
-  const hasExtraNextPages = page + 1 < totalPages
-
   const hrefFor = (targetPage: number): string =>
     hrefPattern.replace('{page}', String(targetPage))
   const goTo = (targetPage: number) => () => router.push(hrefFor(targetPage))
+
+  const renderToken = (token: PageToken) => {
+    if (token.type === 'gap' || token.page === undefined) {
+      return (
+        <PaginationItem key={token.key}>
+          <PaginationEllipsis />
+        </PaginationItem>
+      )
+    }
+
+    return (
+      <PaginationItem key={token.key}>
+        <PaginationLink isActive={token.page === page} onClick={goTo(token.page)}>
+          {token.page}
+        </PaginationLink>
+      </PaginationItem>
+    )
+  }
 
   return (
     <div className={cn('my-12', className)}>
@@ -41,35 +58,7 @@ export const Pagination: React.FC<{
             <PaginationPrevious disabled={!hasPrevPage} onClick={goTo(page - 1)} />
           </PaginationItem>
 
-          {hasExtraPrevPages && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-
-          {hasPrevPage && (
-            <PaginationItem>
-              <PaginationLink onClick={goTo(page - 1)}>{page - 1}</PaginationLink>
-            </PaginationItem>
-          )}
-
-          <PaginationItem>
-            <PaginationLink isActive onClick={goTo(page)}>
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-
-          {hasNextPage && (
-            <PaginationItem>
-              <PaginationLink onClick={goTo(page + 1)}>{page + 1}</PaginationLink>
-            </PaginationItem>
-          )}
-
-          {hasExtraNextPages && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
+          {buildPageTokens(page, totalPages).map(renderToken)}
 
           <PaginationItem>
             <PaginationNext disabled={!hasNextPage} onClick={goTo(page + 1)} />
