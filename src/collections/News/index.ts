@@ -8,6 +8,7 @@ import {
   InlineToolbarFeature,
   OrderedListFeature,
   UnorderedListFeature,
+  UploadFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
@@ -25,6 +26,7 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { VideoEmbed } from '../../blocks/VideoEmbed/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateNews, revalidateNewsDelete } from './hooks/revalidateNews'
 
@@ -103,7 +105,8 @@ export const News: CollectionConfig<'news'> = {
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
                     UnorderedListFeature(),
                     OrderedListFeature(),
-                    BlocksFeature({ blocks: [Banner, MediaBlock, CallToAction] }),
+                    BlocksFeature({ blocks: [Banner, MediaBlock, CallToAction, VideoEmbed] }),
+                    UploadFeature(),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),

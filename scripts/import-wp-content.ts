@@ -20,6 +20,9 @@ import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-
 
 const WP_BASE = 'https://drug-card.io/wp-json/wp/v2'
 const DRY_RUN = process.env.DRY_RUN === '1'
+// FORCE_CONTENT=1 rewrites `content` (and missing covers) of EXISTING docs —
+// use after improving the HTML conversion to refresh already-imported bodies.
+const FORCE_CONTENT = process.env.FORCE_CONTENT === '1'
 
 // Manual fixes applied after heuristics; extend as needed.
 const CLIENT_NAME_OVERRIDES: Record<string, string> = {}
@@ -81,34 +84,62 @@ const decodeEntities = (html: string) => {
   return (dom.window.document.body.textContent || '').trim()
 }
 
-const REMOVE_SELECTORS = [
-  'img',
-  'figure',
-  'script',
-  'style',
-  'iframe',
-  '.wp-block-spacer',
-  '.wp-block-buttons',
-]
+const REMOVE_SELECTORS = ['script', 'style', '.wp-block-spacer', '.wp-block-buttons']
 
 const isFactsSidebar = (column: Element) => (column.textContent || '').trim().startsWith('Client:')
 
-const cleanContentHtml = (html: string, { removeSidebar }: { removeSidebar: boolean }) => {
+type InlineAsset = { alt: string; kind: 'image' | 'video'; url: string }
+
+const ASSET_MARKER_PATTERN = /^@@wp-asset:(\d+)@@$/
+
+// Replaces every inline <img>/<iframe> with a marker paragraph and records the
+// asset, so the converted Lexical tree can be patched with real upload/video
+// nodes at the exact positions the original article had them.
+const prepareContentHtml = (html: string, { removeSidebar }: { removeSidebar: boolean }) => {
   const dom = new JSDOM(`<body>${html}</body>`)
   const document = dom.window.document
+  const assets: InlineAsset[] = []
 
   const removeNode = (node: Element) => node.remove()
   const removeBySelector = (selector: string) =>
     Array.from(document.querySelectorAll(selector)).forEach(removeNode)
 
-  if (removeSidebar) {
-    const columns = Array.from(document.querySelectorAll('.wp-block-column'))
-    columns.filter(isFactsSidebar).forEach(removeNode)
-  }
+  const sidebarColumns = removeSidebar
+    ? Array.from(document.querySelectorAll('.wp-block-column')).filter(isFactsSidebar)
+    : []
+  // The facts sidebar holds the client logo — capture it for `clientLogo`
+  // before the whole column is dropped from the article body.
+  const sidebarImage = sidebarColumns[0] ? sidebarColumns[0].querySelector('img') : null
+  const sidebarImageUrl = sidebarImage ? sidebarImage.getAttribute('src') || null : null
+  sidebarColumns.forEach(removeNode)
 
   REMOVE_SELECTORS.forEach(removeBySelector)
 
-  return document.body.innerHTML
+  const replaceWithMarker = (element: Element, asset: InlineAsset) => {
+    const marker = document.createElement('p')
+    marker.textContent = `@@wp-asset:${assets.length}@@`
+    assets.push(asset)
+    const wrapper = element.closest('figure') || element
+    wrapper.replaceWith(marker)
+  }
+
+  const markImage = (image: Element) => {
+    const url = image.getAttribute('src')
+    if (!url) return removeNode(image)
+    replaceWithMarker(image, { alt: image.getAttribute('alt') || '', kind: 'image', url })
+  }
+
+  const markVideo = (frame: Element) => {
+    const url = frame.getAttribute('src') || ''
+    const isYouTube = url.includes('youtube') || url.includes('youtu.be')
+    if (!isYouTube) return removeNode(frame)
+    replaceWithMarker(frame, { alt: '', kind: 'video', url })
+  }
+
+  Array.from(document.querySelectorAll('img')).forEach(markImage)
+  Array.from(document.querySelectorAll('iframe')).forEach(markVideo)
+
+  return { assets, html: document.body.innerHTML, sidebarImageUrl }
 }
 
 const textContentOf = (html: string) => {
@@ -181,11 +212,12 @@ const fetchImageBuffer = async (url: string) => {
 }
 
 const findExistingMediaId = async (payload: Payload, filename: string) => {
-  const baseName = filename.split('.')[0]
   const result = await payload.find({
     collection: 'media',
     limit: 1,
-    where: { filename: { contains: baseName } },
+    // Exact match: WP reuses generic names ("image.jpg") across months, so a
+    // fuzzy `contains` lookup would wrongly dedupe distinct pictures.
+    where: { filename: { equals: filename } },
   })
   const existing = result.docs[0]
   return existing ? String(existing.id) : null
@@ -202,7 +234,7 @@ const createImageUploader =
       return null
     }
 
-    try {
+    const createMediaDocument = async () => {
       const data = await fetchImageBuffer(url)
       const created = await payload.create({
         collection: 'media',
@@ -210,27 +242,81 @@ const createImageUploader =
         file: { data, mimetype: mimetypeFromUrl(url), name: filename, size: data.length },
       })
       return String(created.id)
-    } catch (uploadError) {
-      // A missing cover must not sink the whole import — create the doc bare.
-      payload.logger.warn(`Cover upload failed, continuing without it: ${String(uploadError)}`)
-      return null
+    }
+
+    try {
+      return await createMediaDocument()
+    } catch (firstError) {
+      // Mongo Atlas occasionally aborts the media transaction ("Please retry
+      // your operation") — one delayed retry clears it.
+      payload.logger.warn(`Cover upload failed, retrying once: ${String(firstError)}`)
+      await new Promise(scheduleRetryDelay)
+      try {
+        return await createMediaDocument()
+      } catch (retryError) {
+        // A missing cover must not sink the whole import — create the doc bare.
+        payload.logger.warn(`Cover upload failed again, continuing without it: ${String(retryError)}`)
+        return null
+      }
     }
   }
+
+const scheduleRetryDelay = (resolve: (value: unknown) => void) => {
+  setTimeout(resolve, 1500)
+}
 
 // --- Shared import plumbing -------------------------------------------------
 
 type ImportableCollection = 'news' | 'case-studies'
 
-const findIdBySlug = async (payload: Payload, collection: string, slug: string) => {
+type ExistingDocument = { id: string; hasCover: boolean }
+
+const findExistingBySlug = async (
+  payload: Payload,
+  collection: ImportableCollection,
+  slug: string,
+): Promise<ExistingDocument | null> => {
   const result = await payload.find({
-    // Runtime-checked by Payload; keeps one helper for all slug lookups.
-    collection: collection as ImportableCollection,
+    collection,
+    depth: 0,
     draft: true,
     limit: 1,
+    select: { coverImage: true },
     where: { slug: { equals: slug } },
   })
   const existing = result.docs[0]
-  return existing ? String(existing.id) : null
+  if (!existing) return null
+  return { id: String(existing.id), hasCover: Boolean(existing.coverImage) }
+}
+
+// A previous run may have created the doc while its cover upload hit a
+// transient DB error — re-runs patch the missing cover instead of skipping.
+const backfillCover = async (
+  payload: Payload,
+  collection: ImportableCollection,
+  existing: ExistingDocument,
+  slug: string,
+  coverId: string | null,
+) => {
+  if (existing.hasCover || !coverId) {
+    payload.logger.info(`${collection} "${slug}" already exists — skipped`)
+    return 'skipped'
+  }
+
+  if (DRY_RUN) {
+    payload.logger.info(`[dry-run] would backfill cover for ${collection} "${slug}"`)
+    return 'cover-backfilled'
+  }
+
+  await payload.update({
+    collection,
+    context: { disableRevalidate: true },
+    data: { coverImage: coverId, meta: { image: coverId } },
+    id: existing.id,
+  })
+
+  payload.logger.info(`Backfilled cover for ${collection} "${slug}"`)
+  return 'cover-backfilled'
 }
 
 const coverUrlOf = (item: WpDocument) => {
@@ -246,31 +332,138 @@ const buildSeoMeta = (item: WpDocument, coverId: string | null) => ({
   image: coverId || undefined,
 })
 
+// --- Lexical tree patching (inline images / videos) --------------------------
+
+type LexicalNode = { children?: LexicalNode[]; text?: string; type?: string; [key: string]: unknown }
+
+const textOfChild = (child: LexicalNode) => (typeof child.text === 'string' ? child.text : '')
+
+const markerIndexOf = (node: LexicalNode) => {
+  if (node.type !== 'paragraph' || !Array.isArray(node.children)) return null
+  const match = node.children.map(textOfChild).join('').trim().match(ASSET_MARKER_PATTERN)
+  return match ? Number(match[1]) : null
+}
+
+const buildUploadNode = (mediaId: string): LexicalNode => ({
+  type: 'upload',
+  fields: null,
+  format: '',
+  relationTo: 'media',
+  value: mediaId,
+  version: 3,
+})
+
+const buildVideoBlockNode = (videoUrl: string, index: number): LexicalNode => ({
+  type: 'block',
+  fields: {
+    id: `wpvideo${index}`,
+    blockName: '',
+    blockType: 'videoEmbed',
+    videoUrl,
+  },
+  format: '',
+  version: 2,
+})
+
+const replaceMarkerNodes = (
+  nodes: LexicalNode[],
+  toReplacement: (index: number) => LexicalNode | null,
+): LexicalNode[] => {
+  const replaceNode = (node: LexicalNode): LexicalNode | null => {
+    const markerIndex = markerIndexOf(node)
+    if (markerIndex !== null) return toReplacement(markerIndex)
+    if (!Array.isArray(node.children)) return node
+    return { ...node, children: replaceMarkerNodes(node.children, toReplacement) }
+  }
+
+  const isKeptNode = (node: LexicalNode | null): node is LexicalNode => node !== null
+
+  return nodes.map(replaceNode).filter(isKeptNode)
+}
+
+const buildRichTextContent = async (
+  payload: Payload,
+  editorConfig: EditorConfig,
+  item: WpDocument,
+  { coverUrl, removeSidebar }: { coverUrl?: string; removeSidebar: boolean },
+) => {
+  const prepared = prepareContentHtml(item.content.rendered, { removeSidebar })
+  const uploadImage = createImageUploader(payload)
+  const coverFilename = coverUrl ? filenameFromUrl(withoutSizeSuffix(coverUrl)) : null
+
+  const uploadInlineAsset = async (asset: InlineAsset) => {
+    if (asset.kind !== 'image') return null
+    // The cover already renders above the article — skip its inline duplicate.
+    const assetFilename = filenameFromUrl(withoutSizeSuffix(asset.url))
+    if (coverFilename && assetFilename === coverFilename) return null
+    return uploadImage({ alt: asset.alt, url: asset.url })
+  }
+
+  const uploadedIds = await Promise.all(prepared.assets.map(uploadInlineAsset))
+
+  const state = convertHTMLToLexical({
+    editorConfig,
+    html: prepared.html,
+    JSDOM,
+  }) as unknown as { root: { children: LexicalNode[] } & Record<string, unknown> }
+
+  const toReplacement = (index: number) => {
+    const asset = prepared.assets[index]
+    if (!asset) return null
+    if (asset.kind === 'video') return buildVideoBlockNode(asset.url, index)
+    const mediaId = uploadedIds[index]
+    return mediaId ? buildUploadNode(mediaId) : null
+  }
+
+  const content = {
+    ...state,
+    root: { ...state.root, children: replaceMarkerNodes(state.root.children, toReplacement) },
+  }
+
+  return { content, sidebarImageUrl: prepared.sidebarImageUrl }
+}
+
 // --- News -------------------------------------------------------------------
 
 const importNewsItem =
   (payload: Payload, editorConfig: EditorConfig) => async (item: WpDocument) => {
-    const existingId = await findIdBySlug(payload, 'news', item.slug)
-    if (existingId) {
-      payload.logger.info(`news "${item.slug}" already exists — skipped`)
-      return 'skipped'
-    }
+    const existing = await findExistingBySlug(payload, 'news', item.slug)
 
     const title = decodeEntities(item.title.rendered)
     const coverUrl = coverUrlOf(item)
+    const needsCover = !existing || !existing.hasCover
     const uploadImage = createImageUploader(payload)
-    const coverId = coverUrl ? await uploadImage({ alt: title, url: coverUrl }) : null
+    const coverId = coverUrl && needsCover ? await uploadImage({ alt: title, url: coverUrl }) : null
 
-    if (DRY_RUN) {
-      payload.logger.info(`[dry-run] would create news "${item.slug}"`)
-      return 'created'
+    if (existing && !FORCE_CONTENT) {
+      return backfillCover(payload, 'news', existing, item.slug, coverId)
     }
 
-    const content = convertHTMLToLexical({
-      editorConfig,
-      html: cleanContentHtml(item.content.rendered, { removeSidebar: false }),
-      JSDOM,
+    if (DRY_RUN) {
+      const action = existing ? 'update content of' : 'create'
+      payload.logger.info(`[dry-run] would ${action} news "${item.slug}"`)
+      return existing ? 'content-updated' : 'created'
+    }
+
+    const { content } = await buildRichTextContent(payload, editorConfig, item, {
+      coverUrl: coverUrl || undefined,
+      removeSidebar: false,
     })
+
+    if (existing) {
+      await payload.update({
+        collection: 'news',
+        context: { disableRevalidate: true },
+        id: existing.id,
+        locale: 'en',
+        data: {
+          content,
+          ...(coverId ? { coverImage: coverId, meta: { image: coverId } } : {}),
+        } as RequiredDataFromCollectionSlug<'news'>,
+      })
+      payload.logger.info(`Updated content of news "${item.slug}"`)
+      return 'content-updated'
+    }
 
     await payload.create({
       collection: 'news',
@@ -296,31 +489,53 @@ const importNewsItem =
 
 const importCaseStudy =
   (payload: Payload, editorConfig: EditorConfig) => async (item: WpDocument) => {
-    const existingId = await findIdBySlug(payload, 'case-studies', item.slug)
-    if (existingId) {
-      payload.logger.info(`case study "${item.slug}" already exists — skipped`)
-      return 'skipped'
-    }
+    const existing = await findExistingBySlug(payload, 'case-studies', item.slug)
 
     const title = decodeEntities(item.title.rendered)
     const fullText = textContentOf(item.content.rendered)
     const coverUrl = coverUrlOf(item)
+    const needsCover = !existing || !existing.hasCover
     const uploadImage = createImageUploader(payload)
-    const coverId = coverUrl ? await uploadImage({ alt: title, url: coverUrl }) : null
+    const coverId = coverUrl && needsCover ? await uploadImage({ alt: title, url: coverUrl }) : null
 
-    if (DRY_RUN) {
-      payload.logger.info(
-        `[dry-run] would create case study "${item.slug}" ` +
-          `(client: ${clientNameFromTitle(item.slug, title)}, region: ${extractRegion(fullText)})`,
-      )
-      return 'created'
+    if (existing && !FORCE_CONTENT) {
+      return backfillCover(payload, 'case-studies', existing, item.slug, coverId)
     }
 
-    const content = convertHTMLToLexical({
-      editorConfig,
-      html: cleanContentHtml(item.content.rendered, { removeSidebar: true }),
-      JSDOM,
+    if (DRY_RUN) {
+      const action = existing ? 'update content of' : 'create'
+      payload.logger.info(
+        `[dry-run] would ${action} case study "${item.slug}" ` +
+          `(client: ${clientNameFromTitle(item.slug, title)}, region: ${extractRegion(fullText)})`,
+      )
+      return existing ? 'content-updated' : 'created'
+    }
+
+    const { content, sidebarImageUrl } = await buildRichTextContent(payload, editorConfig, item, {
+      coverUrl: coverUrl || undefined,
+      removeSidebar: true,
     })
+
+    const clientName = clientNameFromTitle(item.slug, title)
+    const clientLogoId = sidebarImageUrl
+      ? await uploadImage({ alt: `${clientName} logo`, url: sidebarImageUrl })
+      : null
+
+    if (existing) {
+      await payload.update({
+        collection: 'case-studies',
+        context: { disableRevalidate: true },
+        id: existing.id,
+        locale: 'en',
+        data: {
+          content,
+          ...(clientLogoId ? { clientLogo: clientLogoId } : {}),
+          ...(coverId ? { coverImage: coverId, meta: { image: coverId } } : {}),
+        } as RequiredDataFromCollectionSlug<'case-studies'>,
+      })
+      payload.logger.info(`Updated content of case study "${item.slug}"`)
+      return 'content-updated'
+    }
 
     await payload.create({
       collection: 'case-studies',
@@ -329,7 +544,8 @@ const importCaseStudy =
       data: {
         title,
         slug: item.slug,
-        clientName: clientNameFromTitle(item.slug, title),
+        clientName,
+        clientLogo: clientLogoId || undefined,
         region: extractRegion(fullText),
         productCount: extractProductCount(fullText),
         resultMetric: extractResultMetric(title),
