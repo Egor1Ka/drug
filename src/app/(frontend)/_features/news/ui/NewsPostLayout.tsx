@@ -12,4 +12,10 @@ const Header: React.FC<SlotProps> = ({ children }) => (
 
 const Content: React.FC<SlotProps> = ({ children }) => <div className="container">{children}</div>
 
-export const NewsPostLayout = Object.assign(Root, { Content, Header })
+const Nav: React.FC<SlotProps> = ({ children }) => (
+  <div className="container mt-16">
+    <div className="mx-auto max-w-[48rem] border-t border-border pt-8">{children}</div>
+  </div>
+)
+
+export const NewsPostLayout = Object.assign(Root, { Content, Header, Nav })

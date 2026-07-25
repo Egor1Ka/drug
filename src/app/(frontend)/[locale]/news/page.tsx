@@ -25,10 +25,13 @@ export default async function NewsListingPage({ params: paramsPromise }: Args) {
   return (
     <NewsListingLayout>
       <NewsListingLayout.Header>
-        <h1 className="text-4xl font-bold">News &amp; Updates</h1>
-        <p className="mt-3 text-muted-foreground">
-          Product releases, industry events, and insights from the world of pharmacovigilance.
-        </p>
+        <div className="mx-auto max-w-[52rem] text-center">
+          <h1 className="text-4xl font-bold md:text-5xl">News &amp; Updates</h1>
+          <p className="mt-6 text-xl">Stay informed about the latest from DrugCard.</p>
+          <p className="mt-3 text-muted-foreground">
+            Product releases, industry events, and insights from the world of pharmacovigilance.
+          </p>
+        </div>
       </NewsListingLayout.Header>
 
       <NewsListingLayout.Content>

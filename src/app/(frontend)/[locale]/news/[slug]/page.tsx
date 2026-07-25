@@ -11,7 +11,13 @@ import { Media } from '@/components/Media'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import RichText from '@/components/RichText'
 import { Show } from '@frontend/_shared/ui/Show'
-import { NewsPostLayout, fetchAllNewsSlugs, fetchNewsBySlug } from '@frontend/_features/news'
+import {
+  NewsPostLayout,
+  NewsPostNav,
+  fetchAdjacentNews,
+  fetchAllNewsSlugs,
+  fetchNewsBySlug,
+} from '@frontend/_features/news'
 import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
@@ -47,6 +53,11 @@ export default async function NewsItem({ params: paramsPromise }: Args) {
   const publishedDate = item.publishedAt ? formatPublishedDate(item.publishedAt) : null
   const coverImage =
     item.coverImage && typeof item.coverImage === 'object' ? item.coverImage : null
+
+  const adjacent = item.publishedAt
+    ? await fetchAdjacentNews(item.publishedAt, locale)
+    : { next: null, previous: null }
+  const hasAdjacent = Boolean(adjacent.previous || adjacent.next)
 
   return (
     <NewsPostLayout>
@@ -84,6 +95,12 @@ export default async function NewsItem({ params: paramsPromise }: Args) {
         <NewsPostLayout.Content>
           <RichText className="mx-auto max-w-[48rem]" data={item.content} enableGutter={false} />
         </NewsPostLayout.Content>
+      </Show>
+
+      <Show when={hasAdjacent}>
+        <NewsPostLayout.Nav>
+          <NewsPostNav next={adjacent.next} previous={adjacent.previous} />
+        </NewsPostLayout.Nav>
       </Show>
     </NewsPostLayout>
   )

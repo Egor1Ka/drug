@@ -8,31 +8,40 @@ import { formatPublishedDate } from '@/utilities/formatPublishedDate'
 
 export type NewsCardItem = Pick<News, 'slug' | 'title' | 'excerpt' | 'publishedAt'>
 
+// Mirrors the original drug-card.io news card: white card, title, excerpt,
+// "READ MORE »" link, publication date at the bottom under a divider.
 export const NewsCard: React.FC<{ item: NewsCardItem }> = ({ item }) => {
   const { excerpt, publishedAt, slug, title } = item
   const href = `/news/${slug}`
 
   return (
-    <article className="flex flex-col gap-3 py-8">
-      <Show when={publishedAt}>
-        <time className="text-sm text-muted-foreground" dateTime={publishedAt || undefined}>
-          {publishedAt && formatPublishedDate(publishedAt)}
-        </time>
-      </Show>
+    <article className="flex h-full flex-col rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex flex-1 flex-col gap-4 p-6">
+        <h2 className="text-xl font-bold leading-snug">
+          <Link href={href} className="hover:text-primary">
+            {title}
+          </Link>
+        </h2>
 
-      <h2 className="text-2xl font-semibold leading-snug">
-        <Link href={href} className="hover:text-primary">
-          {title}
+        <Show when={excerpt}>
+          <p className="line-clamp-4 text-sm text-muted-foreground">{excerpt}</p>
+        </Show>
+
+        <Link
+          href={href}
+          className="mt-auto text-xs font-semibold uppercase tracking-wide text-primary hover:opacity-90"
+        >
+          Read more &raquo;
         </Link>
-      </h2>
+      </div>
 
-      <Show when={excerpt}>
-        <p className="text-muted-foreground">{excerpt}</p>
+      <Show when={publishedAt}>
+        <div className="border-t border-border px-6 py-4">
+          <time className="text-sm text-muted-foreground" dateTime={publishedAt || undefined}>
+            {publishedAt && formatPublishedDate(publishedAt)}
+          </time>
+        </div>
       </Show>
-
-      <Link href={href} className="text-sm font-medium text-primary hover:opacity-90">
-        Read more &raquo;
-      </Link>
     </article>
   )
 }

@@ -58,6 +58,54 @@ export const fetchNewsBySlug = cache(async (slug: string, locale: TypedLocale) =
   return result.docs?.[0] || null
 })
 
+export type AdjacentNewsLink = { slug: string; title: string }
+
+const adjacentSelect = { title: true, slug: true } as const
+
+const toAdjacentLink = (doc?: {
+  slug?: string | null
+  title?: string | null
+}): AdjacentNewsLink | null => {
+  if (!doc || !doc.slug || !doc.title) return null
+  return { slug: doc.slug, title: doc.title }
+}
+
+// Prev/next links for the detail page: "previous" is the next-older item,
+// "next" the next-newer one, both by publishedAt (mirrors the original site).
+export const fetchAdjacentNews = cache(async (publishedAt: string, locale: TypedLocale) => {
+  const payload = await getPayload({ config: configPromise })
+
+  const [older, newer] = await Promise.all([
+    payload.find({
+      collection: 'news',
+      depth: 0,
+      limit: 1,
+      locale,
+      overrideAccess: false,
+      pagination: false,
+      select: adjacentSelect,
+      sort: '-publishedAt',
+      where: { publishedAt: { less_than: publishedAt } },
+    }),
+    payload.find({
+      collection: 'news',
+      depth: 0,
+      limit: 1,
+      locale,
+      overrideAccess: false,
+      pagination: false,
+      select: adjacentSelect,
+      sort: 'publishedAt',
+      where: { publishedAt: { greater_than: publishedAt } },
+    }),
+  ])
+
+  return {
+    previous: toAdjacentLink(older.docs[0]),
+    next: toAdjacentLink(newer.docs[0]),
+  }
+})
+
 export const fetchAllNewsSlugs = async () => {
   const payload = await getPayload({ config: configPromise })
 
