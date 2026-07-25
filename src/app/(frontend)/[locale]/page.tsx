@@ -27,6 +27,7 @@ import {
   TestimonialCards,
 } from '@frontend/_features/page-content'
 import { Show } from '@frontend/_shared/ui/Show'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 const HOME_PAGE_KEY = 'home'
 const PRODUCT_VIDEO_ID = 'FFO0DnD-zpw'
@@ -107,5 +108,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const content = await fetchPageContent(HOME_PAGE_KEY, locale)
   const fallback = { title: t('title'), description: t('description') }
 
-  return buildPageMetadata(content, fallback)
+  return {
+    ...buildPageMetadata(content, fallback),
+    alternates: buildLocaleAlternates(locale, '/'),
+  }
 }

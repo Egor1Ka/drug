@@ -14,6 +14,7 @@ import {
   fetchAuthorBySlug,
   fetchPostsByAuthor,
 } from '@frontend/_features/blog'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 export const revalidate = 600
 
@@ -76,5 +77,6 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   return {
     title: metaTitle,
     description: metaDescription,
+    alternates: buildLocaleAlternates(locale, `/blog/author/${decodedSlug}`),
   }
 }

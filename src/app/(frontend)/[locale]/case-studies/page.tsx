@@ -11,6 +11,7 @@ import {
   CaseStudyListingLayout,
   fetchAllCaseStudies,
 } from '@frontend/_features/case-studies'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 export const revalidate = 600
 
@@ -44,11 +45,12 @@ export default async function CaseStudiesListingPage({ params: paramsPromise }: 
 }
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
-  await params
+  const { locale } = await params
 
   return {
     title: 'Case Studies',
     description:
       'How pharmacovigilance teams transformed literature screening with DrugCard.',
+    alternates: buildLocaleAlternates(locale, '/case-studies'),
   }
 }

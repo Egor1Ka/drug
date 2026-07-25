@@ -13,6 +13,7 @@ import {
   fetchPostsByTag,
   fetchTagBySlug,
 } from '@frontend/_features/blog'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 export const revalidate = 600
 
@@ -69,5 +70,6 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   return {
     title: tag ? `Posts tagged ${tag.title} — Blog` : 'Blog',
+    alternates: buildLocaleAlternates(locale, `/blog/tag/${decodedSlug}`),
   }
 }

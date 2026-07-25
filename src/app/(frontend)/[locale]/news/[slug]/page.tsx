@@ -94,5 +94,5 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const item = await fetchNewsBySlug(decodedSlug, locale)
 
-  return generateMeta({ doc: item, url: `/news/${decodedSlug}` })
+  return generateMeta({ doc: item, locale, url: `/news/${decodedSlug}` })
 }

@@ -7,6 +7,7 @@ import type { AppLocale } from '@/i18n/routing'
 
 import { Show } from '@frontend/_shared/ui/Show'
 import { NewsArchive, NewsListingLayout, fetchPublishedNewsPage } from '@frontend/_features/news'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 export const revalidate = 600
 
@@ -40,11 +41,12 @@ export default async function NewsListingPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
-  await params
+  const { locale } = await params
 
   return {
     title: 'News & Updates',
     description:
       'Product releases, industry events, and insights from the world of pharmacovigilance.',
+    alternates: buildLocaleAlternates(locale, '/news'),
   }
 }

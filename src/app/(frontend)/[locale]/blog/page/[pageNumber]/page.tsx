@@ -18,6 +18,7 @@ import {
   fetchPublishedPostsCount,
   fetchPublishedPostsPage,
 } from '@frontend/_features/blog'
+import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 import PageClient from './page.client'
 
 export const revalidate = 600
@@ -75,9 +76,10 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { pageNumber } = await paramsPromise
+  const { locale, pageNumber } = await paramsPromise
   return {
     title: `Blog — Page ${pageNumber || ''}`,
+    alternates: buildLocaleAlternates(locale, `/blog/page/${pageNumber}`),
   }
 }
 

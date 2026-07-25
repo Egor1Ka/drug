@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 
+import type { AppLocale } from '@/i18n/routing'
 import type { Media, News, Post, CaseStudy, Config } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
+import { buildLocaleAlternates, localizedUrl } from './buildLocaleAlternates'
 import { getServerSideURL } from './getURL'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
@@ -23,9 +25,10 @@ const BRAND = 'DrugCard'
 
 export const generateMeta = async (args: {
   doc: Partial<Post> | Partial<News> | Partial<CaseStudy> | null
+  locale: AppLocale
   url?: string
 }): Promise<Metadata> => {
-  const { doc, url } = args
+  const { doc, locale, url } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
@@ -35,10 +38,11 @@ export const generateMeta = async (args: {
   const contentTitle = doc?.meta?.title || (typeof doc?.title === 'string' ? doc.title : undefined)
   const title = contentTitle ? `${contentTitle} | ${BRAND}` : BRAND
 
-  const serverUrl = getServerSideURL()
+  const path = url || '/'
 
   return {
     description: doc?.meta?.description,
+    alternates: buildLocaleAlternates(locale, path),
     openGraph: mergeOpenGraph({
       description: doc?.meta?.description || '',
       images: ogImage
@@ -49,7 +53,7 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: url ? serverUrl + url : serverUrl,
+      url: localizedUrl(locale, path),
     }),
     title,
   }
