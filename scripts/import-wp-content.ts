@@ -38,14 +38,18 @@ type WpYoast = {
 
 type WpDocument = {
   author?: number
+  categories?: number[]
   content: WpRendered
   date_gmt: string
   slug: string
+  tags?: number[]
   title: WpRendered
   yoast_head_json?: WpYoast
 }
 
 type WpUser = { id: number; name: string; slug: string }
+
+type WpTerm = { count: number; id: number; name: string; slug: string }
 
 type EditorConfig = Awaited<ReturnType<typeof editorConfigFactory.default>>
 
@@ -193,9 +197,11 @@ const mimetypeFromUrl = (url: string) => {
 
 const filenameFromUrl = (url: string) => url.split('/').slice(-1)[0].split('?')[0]
 
-// WP og_image URLs often point at a resized variant ("...-1024x575.png") that
-// may not exist anymore; the original file (suffix stripped) usually does.
-const withoutSizeSuffix = (url: string) => url.replace(/-\d+x\d+(\.[a-z]+)$/i, '$1')
+// WP og_image URLs often point at a resized variant ("...-1024x575.png",
+// "...-scaled.jpg") that may not exist anymore; the original file (suffix
+// stripped) usually does.
+const withoutSizeSuffix = (url: string) =>
+  url.replace(/-\d+x\d+(\.[a-z]+)$/i, '$1').replace(/-scaled(\.[a-z]+)$/i, '$1')
 
 const fetchImageBuffer = async (url: string) => {
   const response = await fetch(url)
@@ -267,7 +273,14 @@ const scheduleRetryDelay = (resolve: (value: unknown) => void) => {
 
 // --- Shared import plumbing -------------------------------------------------
 
-type ImportableCollection = 'news' | 'case-studies'
+type ImportableCollection = 'case-studies' | 'news' | 'posts'
+
+// News and case studies show the cover via `coverImage`; blog posts via `heroImage`.
+const COVER_FIELD: Record<ImportableCollection, 'coverImage' | 'heroImage'> = {
+  'case-studies': 'coverImage',
+  news: 'coverImage',
+  posts: 'heroImage',
+}
 
 type ExistingDocument = { id: string; hasCover: boolean }
 
@@ -276,17 +289,19 @@ const findExistingBySlug = async (
   collection: ImportableCollection,
   slug: string,
 ): Promise<ExistingDocument | null> => {
+  const coverField = COVER_FIELD[collection]
+
   const result = await payload.find({
     collection,
     depth: 0,
     draft: true,
     limit: 1,
-    select: { coverImage: true },
+    select: { [coverField]: true },
     where: { slug: { equals: slug } },
   })
-  const existing = result.docs[0]
+  const existing = result.docs[0] as unknown as Record<string, unknown> | undefined
   if (!existing) return null
-  return { id: String(existing.id), hasCover: Boolean(existing.coverImage) }
+  return { id: String(existing.id), hasCover: Boolean(existing[coverField]) }
 }
 
 // A previous run may have created the doc while its cover upload hit a
@@ -311,7 +326,7 @@ const backfillCover = async (
   await payload.update({
     collection,
     context: { disableRevalidate: true },
-    data: { coverImage: coverId, meta: { image: coverId } },
+    data: { [COVER_FIELD[collection]]: coverId, meta: { image: coverId } },
     id: existing.id,
   })
 
@@ -562,6 +577,158 @@ const importCaseStudy =
     return 'created'
   }
 
+// --- Categories & Tags -------------------------------------------------------
+
+type TaxonomyCollection = 'categories' | 'tags'
+
+const hasPosts = (term: WpTerm) => term.count > 0
+
+const ensureTaxonomyDoc =
+  (payload: Payload, collection: TaxonomyCollection) => async (term: WpTerm) => {
+    const existing = await payload.find({
+      collection,
+      limit: 1,
+      where: { slug: { equals: term.slug } },
+    })
+
+    const existingDoc = existing.docs[0]
+    if (existingDoc) return [term.id, String(existingDoc.id)] as const
+
+    if (DRY_RUN) {
+      payload.logger.info(`[dry-run] would create ${collection} "${term.slug}"`)
+      return [term.id, `dry-${term.slug}`] as const
+    }
+
+    const created = await payload.create({
+      collection,
+      context: { disableRevalidate: true },
+      locale: 'en',
+      data: {
+        title: decodeEntities(term.name),
+        slug: term.slug,
+      } as RequiredDataFromCollectionSlug<TaxonomyCollection>,
+    })
+
+    payload.logger.info(`Created ${collection} "${term.slug}"`)
+    return [term.id, String(created.id)] as const
+  }
+
+// Only terms actually used by posts — WP holds stale/duplicate empty terms.
+const buildTaxonomyMap = async (
+  payload: Payload,
+  collection: TaxonomyCollection,
+  terms: WpTerm[],
+) => {
+  const entries = await Promise.all(terms.filter(hasPosts).map(ensureTaxonomyDoc(payload, collection)))
+  return new Map(entries)
+}
+
+// --- Blog posts ---------------------------------------------------------------
+
+type PostRelationMaps = {
+  authors: Map<number, string>
+  categories: Map<number, string>
+  tags: Map<number, string>
+}
+
+const importPost =
+  (payload: Payload, editorConfig: EditorConfig, maps: PostRelationMaps) =>
+  async (item: WpDocument) => {
+    const existing = await findExistingBySlug(payload, 'posts', item.slug)
+
+    const title = decodeEntities(item.title.rendered)
+    const coverUrl = coverUrlOf(item)
+    const needsCover = !existing || !existing.hasCover
+    const uploadImage = createImageUploader(payload)
+    const coverId = coverUrl && needsCover ? await uploadImage({ alt: title, url: coverUrl }) : null
+
+    if (existing && !FORCE_CONTENT) {
+      return backfillCover(payload, 'posts', existing, item.slug, coverId)
+    }
+
+    if (DRY_RUN) {
+      const action = existing ? 'update content of' : 'create'
+      payload.logger.info(`[dry-run] would ${action} post "${item.slug}"`)
+      return existing ? 'content-updated' : 'created'
+    }
+
+    const { content } = await buildRichTextContent(payload, editorConfig, item, {
+      coverUrl: coverUrl || undefined,
+      removeSidebar: false,
+    })
+
+    if (existing) {
+      await payload.update({
+        collection: 'posts',
+        context: { disableRevalidate: true },
+        id: existing.id,
+        locale: 'en',
+        data: {
+          content,
+          ...(coverId ? { heroImage: coverId, meta: { image: coverId } } : {}),
+        } as RequiredDataFromCollectionSlug<'posts'>,
+      })
+      payload.logger.info(`Updated content of post "${item.slug}"`)
+      return 'content-updated'
+    }
+
+    const toMappedId = (map: Map<number, string>) => (wpId: number) => map.get(wpId)
+    const categoryIds = (item.categories || []).map(toMappedId(maps.categories)).filter(Boolean) as string[]
+    const tagIds = (item.tags || []).map(toMappedId(maps.tags)).filter(Boolean) as string[]
+    const authorId = item.author ? maps.authors.get(item.author) : undefined
+
+    await payload.create({
+      collection: 'posts',
+      context: { disableRevalidate: true },
+      locale: 'en',
+      data: {
+        title,
+        slug: item.slug,
+        content,
+        heroImage: coverId || undefined,
+        categories: categoryIds,
+        tags: tagIds,
+        authors: authorId ? [authorId] : undefined,
+        publishedAt: publishedAtOf(item),
+        meta: buildSeoMeta(item, coverId),
+        _status: 'published',
+      } as RequiredDataFromCollectionSlug<'posts'>,
+    })
+
+    payload.logger.info(`Created post "${item.slug}"`)
+    return 'created'
+  }
+
+// 194 posts × cover + inline images: chunked batches keep WP and the DB from
+// being hammered by 200 concurrent downloads.
+const POSTS_BATCH_SIZE = 8
+
+const chunkItems = <T,>(items: T[], size: number): T[][] => {
+  const addToChunks = (chunks: T[][], item: T, index: number): T[][] => {
+    if (index % size === 0) return [...chunks, [item]]
+    const lastChunk = chunks[chunks.length - 1]
+    return [...chunks.slice(0, -1), [...lastChunk, item]]
+  }
+  return items.reduce(addToChunks, [])
+}
+
+const importPostsInBatches = async (
+  payload: Payload,
+  editorConfig: EditorConfig,
+  maps: PostRelationMaps,
+  wpPosts: WpDocument[],
+) => {
+  const importOne = importPost(payload, editorConfig, maps)
+
+  const runBatch = async (previous: Promise<string[]>, batch: WpDocument[]) => {
+    const finished = await previous
+    const batchResults = await Promise.all(batch.map(importOne))
+    return [...finished, ...batchResults]
+  }
+
+  return chunkItems(wpPosts, POSTS_BATCH_SIZE).reduce(runBatch, Promise.resolve([] as string[]))
+}
+
 // --- Authors ----------------------------------------------------------------
 
 const ensureAuthor = (payload: Payload) => async (user: WpUser) => {
@@ -656,16 +823,19 @@ const importWpContent = async () => {
 
   payload.logger.info(`Fetching content from ${WP_BASE} ${DRY_RUN ? '(DRY RUN)' : ''}`)
 
-  const [newsItems, caseStudies, wpPosts, users] = await Promise.all([
+  const [newsItems, caseStudies, wpPosts, users, wpCategories, wpTags] = await Promise.all([
     fetchAllPaged('news-updates'),
     fetchAllPaged('case-study'),
-    fetchAllPaged('posts', 'slug,author'),
+    fetchAllPaged('posts'),
     fetchAllPaged('users', 'id,name,slug') as Promise<unknown> as Promise<WpUser[]>,
+    fetchAllPaged('categories', 'id,name,slug,count') as Promise<unknown> as Promise<WpTerm[]>,
+    fetchAllPaged('tags', 'id,name,slug,count') as Promise<unknown> as Promise<WpTerm[]>,
   ])
 
   payload.logger.info(
     `Fetched: ${newsItems.length} news, ${caseStudies.length} case studies, ` +
-      `${wpPosts.length} posts, ${users.length} users`,
+      `${wpPosts.length} posts, ${users.length} users, ` +
+      `${wpCategories.length} categories, ${wpTags.length} tags`,
   )
 
   const newsResults = await Promise.all(newsItems.map(importNewsItem(payload, editorConfig)))
@@ -677,6 +847,21 @@ const importWpContent = async () => {
   payload.logger.info(`Case studies: ${JSON.stringify(countBy(caseStudyResults))}`)
 
   const wpUserToAuthor = await buildAuthorMap(payload, users, wpPosts)
+
+  const [categoryMap, tagMap] = await Promise.all([
+    buildTaxonomyMap(payload, 'categories', wpCategories),
+    buildTaxonomyMap(payload, 'tags', wpTags),
+  ])
+  payload.logger.info(`Taxonomies ready: ${categoryMap.size} categories, ${tagMap.size} tags`)
+
+  const postResults = await importPostsInBatches(
+    payload,
+    editorConfig,
+    { authors: wpUserToAuthor, categories: categoryMap, tags: tagMap },
+    wpPosts,
+  )
+  payload.logger.info(`Posts: ${JSON.stringify(countBy(postResults))}`)
+
   const linkResults = await Promise.all(wpPosts.map(linkPostAuthor(payload, wpUserToAuthor)))
   payload.logger.info(`Post → author links: ${JSON.stringify(countBy(linkResults))}`)
 
