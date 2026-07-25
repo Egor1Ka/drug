@@ -57,8 +57,11 @@ export const Posts: CollectionConfig<'posts'> = {
       description: true,
     },
   },
+  // Admin list mirrors the frontend ordering (newest published first) instead
+  // of the meaningless DB-creation order left over from the WP import.
+  defaultSort: '-publishedAt',
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({

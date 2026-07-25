@@ -55,6 +55,7 @@ export const CaseStudies: CollectionConfig<'case-studies'> = {
       description: true,
     },
   },
+  defaultSort: '-publishedAt',
   admin: {
     defaultColumns: ['title', 'clientName', 'publishedAt'],
     livePreview: {

@@ -50,6 +50,7 @@ export const News: CollectionConfig<'news'> = {
       description: true,
     },
   },
+  defaultSort: '-publishedAt',
   admin: {
     defaultColumns: ['title', 'slug', 'publishedAt'],
     livePreview: {
