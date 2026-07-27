@@ -1,18 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { collectionAccess, hiddenFor } from '../access/permissions'
 import { slugField } from 'payload'
 
 export const Tags: CollectionConfig = {
   slug: 'tags',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  access: collectionAccess('tags'),
   admin: {
+    hidden: hiddenFor('tags'),
     useAsTitle: 'title',
   },
   fields: [

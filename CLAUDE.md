@@ -3,6 +3,32 @@
 This project uses the Payload CMS skill at `.claude/skills/payload/`.
 Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.claude/skills/payload/reference/` for detailed docs.
 
+## Access control — MANDATORY for every new collection or global
+
+Permissions are per user, per collection, per operation, and they all come from ONE file: `src/access/permissions.ts`. Design rationale lives in `docs/superpowers/specs/2026-07-27-per-user-permissions-design.md`.
+
+**Why this cannot be skipped:** a collection that declares no `access` is not "unprotected pending review" — Payload's default is *any logged-in user may create, update and delete every document in it*. A forgotten `access` block is a silent privilege hole, not a TODO. It never fails a build and never shows up in review diffs as an error.
+
+### Adding a new collection — checklist
+
+1. **Register it in `MANAGED_COLLECTIONS`** (`src/access/permissions.ts`) with its real slug as the key, a human label, and the correct `publicRead` mode:
+   - `open` — anonymous visitors read everything (taxonomies, media, author profiles, anything the public site renders directly);
+   - `published` — anonymous visitors read published documents only; use for every draft-enabled collection;
+   - `none` — nothing readable without an explicit `read` permission (internal data, submissions).
+   `publicRead` describes what an **anonymous** visitor gets. Getting it wrong either leaks drafts to production or takes the public site down.
+2. **`access: collectionAccess('<slug>')`** — never hand-write an access block, never reintroduce a blanket `authenticated` helper.
+3. **`admin: { hidden: hiddenFor('<slug>') }`** — denying without hiding leaves the collection in the sidebar and turns every click into a 403.
+4. **Run `pnpm generate:types`** — the permission group on `Users` is generated from `MANAGED_COLLECTIONS`, so the new checkboxes only exist after regeneration.
+5. **Grant the permissions in the admin** to whoever needs them: a new collection starts invisible to every non-full-admin, which is the intended default.
+
+### The rest of the surface
+
+- **New global** → `access: { read: ..., update: fullAdminOnly }`. Globals are site configuration, they stay outside the matrix. Leaving `update` unset hands site navigation to any logged-in user.
+- **New plugin collection** → wire it through the plugin's own override hook (`overrides.access`, `formOverrides.access`, …) with `collectionAccess`. Plugin defaults are as permissive as Payload's own.
+- **A collection the public must write to** (form submissions and nothing else so far) → spell the exception out inline next to the override with a comment saying why, e.g. `create: () => true`. Never widen the shared factory to accommodate one collection.
+- **New privileged field on `Users`** → give it `access: { update: fullAdminOnlyField }`, otherwise a user can escalate themselves from their own account page. Keep such fields **readable** by their owner: sidebar hiding is evaluated client-side from the `/me` document and breaks if the field is unreadable.
+- **New environment / empty database** → the first user created is granted `fullAdmin` automatically. For a database that already has users, run `scripts/grant-full-admin.ts` against it **before** deploying the access rules.
+
 ## React component conventions
 
 React is the **view layer only** (MVVM mindset). All new components and pages MUST follow these rules:
@@ -45,6 +71,7 @@ src/app/(frontend)/
 1. Create `src/app/(frontend)/_features/<feature>/` with `api/`, `ui/`, and `index.ts` (public API).
 2. Routes in `src/app/(frontend)/<route>/` stay thin: validate params, compose `fetch*` queries from the feature's public API, render `ui` components inside the feature's layout slots.
 3. Need a primitive with no business meaning? Check `_shared/ui/` first, create it there only if a second feature needs it — otherwise keep it inside the feature.
+4. Does the feature introduce a new Payload collection? Then the access checklist at the top of this file is part of the same task, not a follow-up.
 
 ## Data layer conventions (feature `api/`)
 

@@ -21,8 +21,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { collectionAccess, hiddenFor } from '../../access/permissions'
 import { Banner } from '../../blocks/Banner/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -35,12 +34,7 @@ import { revalidateCaseStudies, revalidateCaseStudiesDelete } from './hooks/reva
 // original drug-card.io case studies section).
 export const CaseStudies: CollectionConfig<'case-studies'> = {
   slug: 'case-studies',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
-  },
+  access: collectionAccess('case-studies'),
   defaultPopulate: {
     title: true,
     slug: true,
@@ -58,6 +52,7 @@ export const CaseStudies: CollectionConfig<'case-studies'> = {
   defaultSort: '-publishedAt',
   admin: {
     defaultColumns: ['title', 'clientName', 'publishedAt'],
+    hidden: hiddenFor('case-studies'),
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({

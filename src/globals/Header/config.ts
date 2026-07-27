@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
+import { fullAdminOnly } from '@/access/permissions'
 import { link } from '@/fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
 
@@ -7,6 +8,9 @@ export const Header: GlobalConfig = {
   slug: 'header',
   access: {
     read: () => true,
+    // Site navigation is configuration, not content: it stays outside the
+    // per-collection permission matrix and is reserved for full admins.
+    update: fullAdminOnly,
   },
   fields: [
     {

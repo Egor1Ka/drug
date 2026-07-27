@@ -674,6 +674,26 @@ export interface CaseStudy {
 export interface User {
   id: string;
   name?: string | null;
+  /**
+   * Full access to every collection, every global and to user management.
+   */
+  fullAdmin?: boolean | null;
+  /**
+   * What this user may do in each collection. No operations selected means the collection is hidden from them entirely.
+   */
+  permissions?: {
+    posts?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    news?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    'case-studies'?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    'page-content'?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    media?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    categories?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    tags?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    authors?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    forms?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    'form-submissions'?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    redirects?: ('read' | 'create' | 'update' | 'delete')[] | null;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1421,6 +1441,22 @@ export interface AuthorsSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  fullAdmin?: T;
+  permissions?:
+    | T
+    | {
+        posts?: T;
+        news?: T;
+        'case-studies'?: T;
+        'page-content'?: T;
+        media?: T;
+        categories?: T;
+        tags?: T;
+        authors?: T;
+        forms?: T;
+        'form-submissions'?: T;
+        redirects?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;

@@ -10,6 +10,7 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
 import { Author, News, PageContent, Post } from '@/payload-types'
+import { collectionAccess, hiddenFor } from '@/access/permissions'
 import { getServerSideURL } from '@/utilities/getURL'
 import { pageKeyToPath } from '@/utilities/pageKeyToPath'
 
@@ -139,10 +140,28 @@ const revalidateForm: CollectionAfterChangeHook = ({ doc, req: { context, payloa
   return doc
 }
 
+// The plugin collections ship with `create`/`update`/`delete` unset, which in
+// Payload means "any logged-in user", so they have to be brought under the
+// permission matrix explicitly.
+//
+// Form submissions are the one exception that cannot be handed over wholesale:
+// the public site posts them anonymously, so `create` stays open, and the
+// plugin's rule that a submission is never editable is preserved. The matrix
+// governs who may read and delete them.
+const formSubmissionAccess = {
+  ...collectionAccess('form-submissions'),
+  create: () => true,
+  update: () => false,
+}
+
 export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['posts'],
     overrides: {
+      access: collectionAccess('redirects'),
+      admin: {
+        hidden: hiddenFor('redirects'),
+      },
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
@@ -184,9 +203,19 @@ export const plugins: Plugin[] = [
       payment: false,
     },
     formOverrides: {
+      access: collectionAccess('forms'),
+      admin: {
+        hidden: hiddenFor('forms'),
+      },
       fields: buildFormFields,
       hooks: {
         afterChange: [revalidateForm],
+      },
+    },
+    formSubmissionOverrides: {
+      access: formSubmissionAccess,
+      admin: {
+        hidden: hiddenFor('form-submissions'),
       },
     },
   }),

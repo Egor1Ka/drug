@@ -9,20 +9,14 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
-import { anyone } from '../../access/anyone'
-import { authenticated } from '../../access/authenticated'
+import { collectionAccess, hiddenFor } from '../../access/permissions'
 import { revalidateAuthor, revalidateAuthorDelete } from './hooks/revalidateAuthor'
 
 // Public author profiles powering /blog/author/[slug]. Kept separate from the
 // auth-locked `users` collection so public content never exposes login accounts.
 export const Authors: CollectionConfig<'authors'> = {
   slug: 'authors',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  access: collectionAccess('authors'),
   defaultPopulate: {
     name: true,
     slug: true,
@@ -31,6 +25,7 @@ export const Authors: CollectionConfig<'authors'> = {
   },
   admin: {
     defaultColumns: ['name', 'slug', 'updatedAt'],
+    hidden: hiddenFor('authors'),
     useAsTitle: 'name',
   },
   fields: [

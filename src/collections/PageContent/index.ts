@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone } from '../../access/anyone'
-import { authenticated } from '../../access/authenticated'
+import { collectionAccess, hiddenFor } from '../../access/permissions'
 import { metaTab } from '@/fields/metaTab'
 import { FaqSection, LogosSection, StatsSection, TeamSection, TestimonialsSection } from './blocks'
 import { revalidatePageContent, revalidatePageContentDelete } from './hooks/revalidatePageContent'
@@ -9,14 +8,10 @@ import { validateUniqueSectionKeys } from './validateUniqueSectionKeys'
 
 export const PageContent: CollectionConfig<'page-content'> = {
   slug: 'page-content',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  access: collectionAccess('page-content'),
   admin: {
     defaultColumns: ['pageKey', 'updatedAt'],
+    hidden: hiddenFor('page-content'),
     description:
       'Editable content for hand-coded pages. One document per page; the page code places sections by their keys — block order here does not affect the layout.',
     useAsTitle: 'pageKey',

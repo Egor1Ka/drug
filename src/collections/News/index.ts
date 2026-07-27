@@ -21,8 +21,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { collectionAccess, hiddenFor } from '../../access/permissions'
 import { Banner } from '../../blocks/Banner/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -34,12 +33,7 @@ import { revalidateNews, revalidateNewsDelete } from './hooks/revalidateNews'
 // its own sitemap and menu item (mirrors the original news-updates section).
 export const News: CollectionConfig<'news'> = {
   slug: 'news',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
-  },
+  access: collectionAccess('news'),
   defaultPopulate: {
     title: true,
     slug: true,
@@ -53,6 +47,7 @@ export const News: CollectionConfig<'news'> = {
   defaultSort: '-publishedAt',
   admin: {
     defaultColumns: ['title', 'slug', 'publishedAt'],
+    hidden: hiddenFor('news'),
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
