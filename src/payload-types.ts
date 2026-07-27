@@ -694,6 +694,10 @@ export interface User {
     'form-submissions'?: ('read' | 'create' | 'update' | 'delete')[] | null;
     redirects?: ('read' | 'create' | 'update' | 'delete')[] | null;
   };
+  /**
+   * Site-wide settings this user may edit. These affect every page at once, so grant them deliberately.
+   */
+  globals?: ('header' | 'footer')[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1457,6 +1461,7 @@ export interface UsersSelect<T extends boolean = true> {
         'form-submissions'?: T;
         redirects?: T;
       };
+  globals?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

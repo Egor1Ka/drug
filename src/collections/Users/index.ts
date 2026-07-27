@@ -1,6 +1,7 @@
 import type { Access, CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
 import {
+  buildGlobalOptions,
   buildPermissionFields,
   canEnterAdmin,
   fullAdminOnly,
@@ -79,6 +80,19 @@ export const Users: CollectionConfig = {
           'What this user may do in each collection. No operations selected means the collection is hidden from them entirely.',
       },
       fields: buildPermissionFields(),
+    },
+    {
+      name: 'globals',
+      type: 'select',
+      access: privilegedFieldAccess,
+      admin: {
+        condition: isNotFullAdmin,
+        description:
+          'Site-wide settings this user may edit. These affect every page at once, so grant them deliberately.',
+      },
+      hasMany: true,
+      label: 'Globals',
+      options: buildGlobalOptions(),
     },
   ],
   hooks: {

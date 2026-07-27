@@ -23,7 +23,7 @@ Permissions are per user, per collection, per operation, and they all come from 
 
 ### The rest of the surface
 
-- **New global** → `access: { read: ..., update: fullAdminOnly }`. Globals are site configuration, they stay outside the matrix. Leaving `update` unset hands site navigation to any logged-in user.
+- **New global** → register it in `MANAGED_GLOBALS` (`src/access/permissions.ts`) with its slug, a label and a `publicRead` mode, then wire `access: globalAccess('<slug>')` and `admin: { hidden: hiddenForGlobal('<slug>') }`. Globals grant a single permission — the right to edit — so they render on the user form as one flat `Globals` checkbox list, not a per-operation grid: `read` is what the public site does on every page, and globals have no create or delete. Leaving `update` unset hands site navigation to any logged-in user; leaving `hidden` unset lets an editor open the global, fill it in and only discover on save that the write was never allowed.
 - **New plugin collection** → wire it through the plugin's own override hook (`overrides.access`, `formOverrides.access`, …) with `collectionAccess`. Plugin defaults are as permissive as Payload's own.
 - **A collection the public must write to** (form submissions and nothing else so far) → spell the exception out inline next to the override with a comment saying why, e.g. `create: () => true`. Never widen the shared factory to accommodate one collection.
 - **New privileged field on `Users`** → give it `access: { update: fullAdminOnlyField }`, otherwise a user can escalate themselves from their own account page. Keep such fields **readable** by their owner: sidebar hiding is evaluated client-side from the `/me` document and breaks if the field is unreadable.

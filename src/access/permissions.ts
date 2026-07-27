@@ -40,9 +40,18 @@ export const MANAGED_COLLECTIONS = {
   redirects: { label: 'Redirects', publicRead: 'open' },
 } as const
 
+// Globals carry a single permission — the right to edit them — so they are a
+// flat list rather than a per-operation matrix: `read` is what the public site
+// does on every page, and globals have no create or delete.
+export const MANAGED_GLOBALS = {
+  header: { label: 'Header', publicRead: 'open' },
+  footer: { label: 'Footer', publicRead: 'open' },
+} as const
+
 export const OPERATIONS = ['read', 'create', 'update', 'delete'] as const
 
 export type ManagedCollection = keyof typeof MANAGED_COLLECTIONS
+export type ManagedGlobal = keyof typeof MANAGED_GLOBALS
 export type Operation = (typeof OPERATIONS)[number]
 type PublicRead = (typeof MANAGED_COLLECTIONS)[ManagedCollection]['publicRead']
 
@@ -51,6 +60,7 @@ type PublicRead = (typeof MANAGED_COLLECTIONS)[ManagedCollection]['publicRead']
 // different types carrying the same two fields.
 type PermissionHolder = {
   fullAdmin?: boolean | null
+  globals?: ManagedGlobal[] | null
   permissions?: Partial<Record<ManagedCollection, Operation[] | null>> | null
 }
 
@@ -137,18 +147,57 @@ export const hiddenFor =
 
 export const fullAdminOnly: Access = ({ req: { user } }) => isFullAdmin(asHolder(user))
 
+const mayEditGlobal = (user: PermissionHolder | null, global: ManagedGlobal): boolean => {
+  if (isFullAdmin(user)) return true
+  if (!user || !user.globals) return false
+
+  return user.globals.includes(global)
+}
+
+const canEditGlobal =
+  (global: ManagedGlobal): Access =>
+  ({ req: { user } }) =>
+    mayEditGlobal(asHolder(user), global)
+
+const GLOBAL_READ_STRATEGIES: Record<PublicRead, (global: ManagedGlobal) => Access> = {
+  open: () => openRead,
+  published: () => openRead,
+  none: canEditGlobal,
+}
+
+export const globalAccess = (global: ManagedGlobal) => ({
+  read: GLOBAL_READ_STRATEGIES[MANAGED_GLOBALS[global].publicRead](global),
+  update: canEditGlobal(global),
+})
+
+// Same rule as collections: a global left in the nav without the permission
+// lets an editor open it, fill it in, and discover the denial only on save.
+// Globals hand `hidden` the server-side user type, not `ClientUser`.
+export const hiddenForGlobal =
+  (global: ManagedGlobal) =>
+  ({ user }: { user: PayloadRequest['user'] }): boolean =>
+    !mayEditGlobal(asHolder(user), global)
+
 export const fullAdminOnlyField: FieldAccess = ({ req: { user } }) => isFullAdmin(asHolder(user))
 
 const isPermittedOn = (user: PermissionHolder | null) => (collection: ManagedCollection) =>
   hasAnyPermission(user, collection)
 
+const mayEditAnyGlobal = (user: PermissionHolder | null): boolean => {
+  if (!user || !user.globals) return false
+
+  return user.globals.length > 0
+}
+
 // Nothing granted anywhere → refused at the door instead of landing on an
-// admin panel with an empty sidebar. Typed narrower than `Access`: the `admin`
+// admin panel with an empty sidebar. Someone trusted with the header and
+// nothing else still belongs in. Typed narrower than `Access`: the `admin`
 // operation accepts a boolean only, never a query constraint.
 export const canEnterAdmin = ({ req: { user } }: { req: PayloadRequest }): boolean => {
   const holder = asHolder(user)
   if (!holder) return false
   if (isFullAdmin(holder)) return true
+  if (mayEditAnyGlobal(holder)) return true
 
   return MANAGED_COLLECTION_SLUGS.some(isPermittedOn(holder))
 }
@@ -165,3 +214,13 @@ const toPermissionField = ([slug, { label }]: [string, { label: string }]): Fiel
 // without appearing on the user form.
 export const buildPermissionFields = (): Field[] =>
   Object.entries(MANAGED_COLLECTIONS).map(toPermissionField)
+
+const toGlobalOption = ([slug, { label }]: [string, { label: string }]) => ({
+  label,
+  value: slug,
+})
+
+// Globals get one flat checkbox list instead of the per-operation grid: editing
+// is the only thing there is to grant. The field itself is declared on `Users`;
+// only its options are generated here, so a new global shows up automatically.
+export const buildGlobalOptions = () => Object.entries(MANAGED_GLOBALS).map(toGlobalOption)
