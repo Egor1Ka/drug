@@ -54,8 +54,6 @@ export default async function LocaleLayout({ children, params }: Args) {
     >
       <head>
         <InitTheme />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
         <NextIntlClientProvider>
@@ -78,11 +76,24 @@ export default async function LocaleLayout({ children, params }: Args) {
   )
 }
 
+// The whole icon set is generated from the brand flame by
+// `pnpm generate:favicons`; declaring it here rather than as hand-written
+// <link> tags lets Next emit the right markup and keeps one source of truth.
+const icons: Metadata['icons'] = {
+  apple: [{ sizes: '180x180', type: 'image/png', url: '/apple-touch-icon.png' }],
+  icon: [
+    { sizes: '16x16 32x32 48x48', url: '/favicon.ico' },
+    { type: 'image/svg+xml', url: '/favicon.svg' },
+    { sizes: '192x192', type: 'image/png', url: '/icon-192.png' },
+    { sizes: '512x512', type: 'image/png', url: '/icon-512.png' },
+  ],
+}
+
 export const metadata: Metadata = {
+  icons,
   metadataBase: new URL(getServerSideURL()),
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
   },
 }

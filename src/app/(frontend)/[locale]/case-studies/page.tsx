@@ -11,9 +11,12 @@ import {
   CaseStudyListingLayout,
   fetchAllCaseStudies,
 } from '@frontend/_features/case-studies'
-import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
+import { buildPageMetadata, fetchPageContent } from '@frontend/_features/page-content'
 
 export const revalidate = 600
+
+// SEO for this listing is editable in the admin under Page Contents.
+const CASE_STUDIES_PAGE_KEY = 'case-studies'
 
 type Args = {
   params: Promise<{ locale: AppLocale }>
@@ -47,10 +50,11 @@ export default async function CaseStudiesListingPage({ params: paramsPromise }: 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
 
-  return {
+  const content = await fetchPageContent(CASE_STUDIES_PAGE_KEY, locale)
+  const fallback = {
     title: 'Case Studies',
-    description:
-      'How pharmacovigilance teams transformed literature screening with DrugCard.',
-    alternates: buildLocaleAlternates(locale, '/case-studies'),
+    description: 'How pharmacovigilance teams transformed literature screening with DrugCard.',
   }
+
+  return buildPageMetadata(content, fallback, { locale, path: '/case-studies' })
 }

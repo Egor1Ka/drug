@@ -13,10 +13,10 @@ import {
   JournalsListingLayout,
   fetchPublishedJournals,
 } from '@frontend/_features/journals'
+import { buildPageMetadata, fetchPageContent } from '@frontend/_features/page-content'
 import { Breadcrumbs } from '@frontend/_shared/ui/Breadcrumbs'
 import { DownloadGateProvider } from '@frontend/_shared/ui/DownloadGate'
 import { Show } from '@frontend/_shared/ui/Show'
-import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 
 // Safety net: even if the revalidation hook misses, the listing refreshes
 // within ten minutes.
@@ -25,6 +25,9 @@ export const revalidate = 600
 // Journals keep their own lead form, separate from the documents one, so
 // journal requests stay separable from whitepaper requests.
 const DOWNLOAD_FORM_SLUG = 'journal-download'
+
+// SEO for this listing is editable in the admin under Page Contents.
+const JOURNALS_PAGE_KEY = 'journals'
 
 type Args = {
   params: Promise<{ locale: AppLocale }>
@@ -84,9 +87,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
   const t = await getTranslations({ locale, namespace: 'Journals' })
 
-  return {
-    title: t('title'),
-    description: t('subtitle'),
-    alternates: buildLocaleAlternates(locale, '/local-medical-journals'),
-  }
+  const content = await fetchPageContent(JOURNALS_PAGE_KEY, locale)
+  const fallback = { title: t('title'), description: t('subtitle') }
+
+  return buildPageMetadata(content, fallback, { locale, path: '/local-medical-journals' })
 }

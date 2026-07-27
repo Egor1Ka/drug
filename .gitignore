@@ -24,3 +24,4 @@ node_modules/
 scripts/seed-prod.local.sh
 scripts/import-documents-prod.local.sh
 scripts/import-journals-prod.local.sh
+scripts/import-seo-prod.local.sh

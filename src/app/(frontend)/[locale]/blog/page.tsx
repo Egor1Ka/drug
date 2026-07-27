@@ -18,7 +18,6 @@ import {
   fetchPublishedPostsPage,
 } from '@frontend/_features/blog'
 import { buildPageMetadata, fetchPageContent } from '@frontend/_features/page-content'
-import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 import PageClient from './page.client'
 
 export const revalidate = 600
@@ -91,8 +90,5 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const content = await fetchPageContent(BLOG_PAGE_KEY, locale)
   const fallback = { title: 'Blog', description: '' }
 
-  return {
-    ...buildPageMetadata(content, fallback),
-    alternates: buildLocaleAlternates(locale, '/blog'),
-  }
+  return buildPageMetadata(content, fallback, { locale, path: '/blog' })
 }

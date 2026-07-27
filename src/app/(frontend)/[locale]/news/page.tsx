@@ -7,9 +7,12 @@ import type { AppLocale } from '@/i18n/routing'
 
 import { Show } from '@frontend/_shared/ui/Show'
 import { NewsArchive, NewsListingLayout, fetchPublishedNewsPage } from '@frontend/_features/news'
-import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
+import { buildPageMetadata, fetchPageContent } from '@frontend/_features/page-content'
 
 export const revalidate = 600
+
+// SEO for this listing is editable in the admin under Page Contents.
+const NEWS_PAGE_KEY = 'news'
 
 type Args = {
   params: Promise<{ locale: AppLocale }>
@@ -46,10 +49,12 @@ export default async function NewsListingPage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
 
-  return {
+  const content = await fetchPageContent(NEWS_PAGE_KEY, locale)
+  const fallback = {
     title: 'News & Updates',
     description:
       'Product releases, industry events, and insights from the world of pharmacovigilance.',
-    alternates: buildLocaleAlternates(locale, '/news'),
   }
+
+  return buildPageMetadata(content, fallback, { locale, path: '/news' })
 }
