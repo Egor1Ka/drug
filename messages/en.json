@@ -20,6 +20,24 @@
     "error": "Something went wrong. Please try again.",
     "close": "Close"
   },
+  "Documents": {
+    "title": "Documents & Resources",
+    "subtitle": "All essential materials in one place: AI documentation, practical materials, and additional resources to support your work.",
+    "breadcrumbHome": "Home",
+    "getPdf": "Get PDF",
+    "gateTitle": "Fill out the form to get the document.",
+    "download": "Download PDF",
+    "sending": "Sending...",
+    "formUnavailable": "The form is temporarily unavailable. Please email us instead.",
+    "error": "Something went wrong. Please try again.",
+    "close": "Close",
+    "cta": {
+      "heading": "Have questions for our experts?",
+      "text": "Ask us about pharmacovigilance automation, literature monitoring or DrugCard platform features.",
+      "bookMeeting": "Book 15 minute meeting",
+      "contactUs": "Contact Us"
+    }
+  },
   "Home": {
     "meta": {
       "title": "DrugCard — AI-powered pharmacovigilance automation",

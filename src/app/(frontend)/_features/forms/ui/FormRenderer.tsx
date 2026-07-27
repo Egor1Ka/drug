@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import type { Form } from '@/payload-types'
 import { Show } from '@frontend/_shared/ui/Show'
 
+import type { SubmissionEntry } from '../api/submissions'
 import { buildSubmissionData } from '../helpers/fields'
 import { useFormSubmission } from '../hooks/useFormSubmission'
 
@@ -135,20 +136,32 @@ const FormField: React.FC<{ field: FormFieldBlock }> = ({ field }) => {
 
 type FormRendererProps = {
   errorMessage?: string
+  // Entries appended to every submission of this form instance — context the
+  // form itself cannot know, e.g. which document a download request was for.
+  extraSubmissionData?: SubmissionEntry[]
   form: Form
   submittingLabel?: string
+  // Rendered after the confirmation message once the submission succeeds.
+  // A slot rather than an onSuccess callback: the consumer decides what the
+  // reward for submitting is, and this component stays a passive view.
+  successSlot?: React.ReactNode
 }
 
 export const FormRenderer: React.FC<FormRendererProps> = ({
   errorMessage = DEFAULT_ERROR_MESSAGE,
+  extraSubmissionData,
   form,
   submittingLabel,
+  successSlot,
 }) => {
   const { state, submit } = useFormSubmission(form)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    void submit(buildSubmissionData(new FormData(event.currentTarget)))
+
+    const fieldData = buildSubmissionData(new FormData(event.currentTarget))
+
+    void submit([...fieldData, ...(extraSubmissionData || [])])
   }
 
   const fields = form.fields || []
@@ -168,6 +181,8 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
           enableProse
         />
       </Show>
+
+      <Show when={state === 'success' && !!successSlot}>{successSlot}</Show>
 
       <Show when={state !== 'success'}>
         <form className="space-y-4" onSubmit={handleSubmit}>

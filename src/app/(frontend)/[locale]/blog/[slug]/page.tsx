@@ -11,16 +11,15 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Media } from '@/components/Media'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import RichText from '@/components/RichText'
+import { Breadcrumbs, type Crumb } from '@frontend/_shared/ui/Breadcrumbs'
 import { Show } from '@frontend/_shared/ui/Show'
 import {
   BlogPostLayout,
-  Breadcrumbs,
   SimilarPosts,
   TagChips,
   fetchAllPostSlugs,
   fetchPostBySlug,
   fetchSimilarPosts,
-  type Crumb,
 } from '@frontend/_features/blog'
 import { calculateReadTime } from '@/utilities/readTime'
 import { formatPublishedDate } from '@/utilities/formatPublishedDate'

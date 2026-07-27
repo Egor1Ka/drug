@@ -71,6 +71,7 @@ export interface Config {
     posts: Post;
     news: News;
     'case-studies': CaseStudy;
+    documents: Document;
     media: Media;
     categories: Category;
     tags: Tag;
@@ -96,6 +97,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
@@ -669,6 +671,39 @@ export interface CaseStudy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: string;
+  title: string;
+  /**
+   * Short summary shown on the card, under the title.
+   */
+  description: string;
+  /**
+   * Card cover — usually a screenshot of the first page of the PDF.
+   */
+  coverImage: string | Media;
+  /**
+   * The PDF handed over after the download form is submitted.
+   */
+  file: string | Media;
+  /**
+   * Lower numbers come first in the grid.
+   */
+  order?: number | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -685,6 +720,7 @@ export interface User {
     posts?: ('read' | 'create' | 'update' | 'delete')[] | null;
     news?: ('read' | 'create' | 'update' | 'delete')[] | null;
     'case-studies'?: ('read' | 'create' | 'update' | 'delete')[] | null;
+    documents?: ('read' | 'create' | 'update' | 'delete')[] | null;
     'page-content'?: ('read' | 'create' | 'update' | 'delete')[] | null;
     media?: ('read' | 'create' | 'update' | 'delete')[] | null;
     categories?: ('read' | 'create' | 'update' | 'delete')[] | null;
@@ -1009,6 +1045,10 @@ export interface PayloadLockedDocument {
         value: string | CaseStudy;
       } | null)
     | ({
+        relationTo: 'documents';
+        value: string | Document;
+      } | null)
+    | ({
         relationTo: 'media';
         value: string | Media;
       } | null)
@@ -1288,6 +1328,23 @@ export interface CaseStudiesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  coverImage?: T;
+  file?: T;
+  order?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -1452,6 +1509,7 @@ export interface UsersSelect<T extends boolean = true> {
         posts?: T;
         news?: T;
         'case-studies'?: T;
+        documents?: T;
         'page-content'?: T;
         media?: T;
         categories?: T;
@@ -1941,6 +1999,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'case-studies';
           value: string | CaseStudy;
+        } | null)
+      | ({
+          relationTo: 'documents';
+          value: string | Document;
         } | null);
     global?: string | null;
     user?: (string | null) | User;

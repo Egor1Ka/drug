@@ -20,6 +20,7 @@
     "seed:home": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/enrich-home-content.ts",
     "seed:layout": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-layout.ts",
     "import:wp": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import-wp-content.ts",
+    "import:documents": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import-documents.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",

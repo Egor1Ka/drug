@@ -22,3 +22,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 scripts/seed-prod.local.sh
+scripts/import-documents-prod.local.sh
