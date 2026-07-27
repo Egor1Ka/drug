@@ -1,7 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import type { AppLocale } from '@/i18n/routing'
 
@@ -42,10 +42,12 @@ export default async function TagPage({
 
   const posts = await fetchPostsByTag({ locale, page: currentPage, slug: decodedSlug })
 
+  const t = await getTranslations({ locale, namespace: 'Blog' })
+
   return (
     <BlogListingLayout>
       <BlogListingLayout.Header>
-        <p className="mb-2 text-sm text-muted-foreground">Posts tagged</p>
+        <p className="mb-2 text-sm text-muted-foreground">{t('postsTagged')}</p>
         <h1 className="text-4xl font-bold">{tag.title}</h1>
       </BlogListingLayout.Header>
 

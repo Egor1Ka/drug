@@ -1,7 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import React from 'react'
 
 import type { AppLocale } from '@/i18n/routing'
@@ -87,8 +87,10 @@ export default async function Page({
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
 
+  const t = await getTranslations({ locale, namespace: 'Blog' })
+
   const content = await fetchPageContent(BLOG_PAGE_KEY, locale)
-  const fallback = { title: 'Blog', description: '' }
+  const fallback = { title: t('title'), description: '' }
 
   return buildPageMetadata(content, fallback, { locale, path: '/blog' })
 }

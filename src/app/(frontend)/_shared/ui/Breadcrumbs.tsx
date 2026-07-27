@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React, { Fragment } from 'react'
 
 export type Crumb = {
@@ -19,8 +20,14 @@ const renderCrumb = (crumb: Crumb, index: number) => (
   </Fragment>
 )
 
-export const Breadcrumbs: React.FC<{ crumbs: Crumb[] }> = ({ crumbs }) => (
-  <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm">
-    {crumbs.map(renderCrumb)}
-  </nav>
-)
+export const Breadcrumbs: React.FC<{ crumbs: Crumb[] }> = ({ crumbs }) => {
+  // The landmark label is read out by screen readers, so it is translated too.
+  // `Layout` is the neutral namespace for chrome strings with no feature owner.
+  const t = useTranslations('Layout')
+
+  return (
+    <nav aria-label={t('breadcrumb')} className="flex flex-wrap items-center gap-2 text-sm">
+      {crumbs.map(renderCrumb)}
+    </nav>
+  )
+}

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import type { Category } from '@/payload-types'
@@ -38,7 +39,9 @@ export const CategoryTabs: React.FC<{ activeSlug?: string; categories: Category[
   activeSlug,
   categories,
 }) => {
-  const allTab: CategoryTab = { href: '/blog', isActive: !activeSlug, title: 'All' }
+  const t = useTranslations('Blog')
+
+  const allTab: CategoryTab = { href: '/blog', isActive: !activeSlug, title: t('allCategories') }
   const tabs = [allTab, ...categories.map(toTab(activeSlug))]
 
   return <nav className="flex flex-wrap gap-3">{tabs.map(renderTab)}</nav>

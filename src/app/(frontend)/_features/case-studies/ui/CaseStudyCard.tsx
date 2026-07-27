@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import type { CaseStudy } from '@/payload-types'
@@ -12,6 +13,7 @@ export type CaseStudyCardItem = Pick<
 >
 
 export const CaseStudyCard: React.FC<{ item: CaseStudyCardItem }> = ({ item }) => {
+  const t = useTranslations('CaseStudies')
   const { excerpt, publishedAt, region, resultMetric, slug, title } = item
   const href = `/case-study/${slug}`
 
@@ -42,7 +44,7 @@ export const CaseStudyCard: React.FC<{ item: CaseStudyCardItem }> = ({ item }) =
       </Show>
 
       <Link href={href} className="text-sm font-medium text-primary hover:opacity-90">
-        Read case study &raquo;
+        {t('readMore')} &raquo;
       </Link>
     </article>
   )

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import type { AppLocale } from '@/i18n/routing'
 
@@ -68,7 +68,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const author = await fetchAuthorBySlug(decodedSlug, locale)
 
-  if (!author) return { title: 'Blog' }
+  const t = await getTranslations({ locale, namespace: 'Blog' })
+
+  if (!author) return { title: t('title') }
 
   const metaTitle = author.meta && author.meta.title ? author.meta.title : `${author.name} — Blog`
   const metaDescription =

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next/types'
 
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import React from 'react'
 
 import type { AppLocale } from '@/i18n/routing'
@@ -25,15 +25,15 @@ export default async function NewsListingPage({ params: paramsPromise }: Args) {
 
   const news = await fetchPublishedNewsPage({ locale, page: 1 })
 
+  const t = await getTranslations({ locale, namespace: 'News' })
+
   return (
     <NewsListingLayout>
       <NewsListingLayout.Header>
-        <div className="mx-auto max-w-[52rem] text-center">
-          <h1 className="text-4xl font-bold md:text-5xl">News &amp; Updates</h1>
-          <p className="mt-6 text-xl">Stay informed about the latest from DrugCard.</p>
-          <p className="mt-3 text-muted-foreground">
-            Product releases, industry events, and insights from the world of pharmacovigilance.
-          </p>
+        <div className="mx-auto max-w-208 text-center">
+          <h1 className="text-4xl font-bold md:text-5xl">{t('title')}</h1>
+          <p className="mt-6 text-xl">{t('subtitle')}</p>
+          <p className="mt-3 text-muted-foreground">{t('description')}</p>
         </div>
       </NewsListingLayout.Header>
 
@@ -49,12 +49,10 @@ export default async function NewsListingPage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
 
+  const t = await getTranslations({ locale, namespace: 'News' })
+
   const content = await fetchPageContent(NEWS_PAGE_KEY, locale)
-  const fallback = {
-    title: 'News & Updates',
-    description:
-      'Product releases, industry events, and insights from the world of pharmacovigilance.',
-  }
+  const fallback = { title: t('title'), description: t('description') }
 
   return buildPageMetadata(content, fallback, { locale, path: '/news' })
 }

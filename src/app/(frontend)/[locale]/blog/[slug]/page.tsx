@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { draftMode } from 'next/headers'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import React from 'react'
 
 import type { AppLocale } from '@/i18n/routing'
@@ -48,7 +48,14 @@ export async function generateStaticParams() {
 const isCategoryObject = (category: Category | string): category is Category =>
   typeof category === 'object'
 
-const buildCrumbs = (post: Post): Crumb[] => {
+type CrumbLabels = {
+  blog: string
+  home: string
+}
+
+// Labels are passed in rather than translated here so the builder stays a pure
+// function of its arguments.
+const buildCrumbs = (post: Post, labels: CrumbLabels): Crumb[] => {
   const categories = (post.categories || []).filter(isCategoryObject)
   const firstCategory = categories[0]
   const categoryCrumbs = firstCategory
@@ -56,8 +63,8 @@ const buildCrumbs = (post: Post): Crumb[] => {
     : []
 
   return [
-    { href: '/', label: 'Home' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/', label: labels.home },
+    { href: '/blog', label: labels.blog },
     ...categoryCrumbs,
     { label: post.title },
   ]
@@ -83,6 +90,9 @@ export default async function Post({ params: paramsPromise }: Args) {
   const tags = post.tags || []
   const similarPosts = await fetchSimilarPosts(post, locale)
 
+  const t = await getTranslations({ locale, namespace: 'Blog' })
+  const crumbLabels = { blog: t('title'), home: t('home') }
+
   return (
     <BlogPostLayout>
       <PageClient />
@@ -95,7 +105,7 @@ export default async function Post({ params: paramsPromise }: Args) {
       </Show>
 
       <BlogPostLayout.Header>
-        <Breadcrumbs crumbs={buildCrumbs(post)} />
+        <Breadcrumbs crumbs={buildCrumbs(post, crumbLabels)} />
         <h1 className="mt-6 text-3xl font-bold md:text-5xl">{post.title}</h1>
 
         <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">

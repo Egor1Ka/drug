@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import { Show } from '@frontend/_shared/ui/Show'
@@ -7,15 +8,11 @@ import type { AdjacentNewsLink } from '../api/news'
 
 type Direction = 'next' | 'previous'
 
-const DIRECTION_LABELS: Record<Direction, string> = {
-  next: 'Next',
-  previous: 'Previous',
-}
-
 const AdjacentLink: React.FC<{ direction: Direction; item: AdjacentNewsLink }> = ({
   direction,
   item,
 }) => {
+  const t = useTranslations('News')
   const isPrevious = direction === 'previous'
 
   return (
@@ -31,7 +28,7 @@ const AdjacentLink: React.FC<{ direction: Direction; item: AdjacentNewsLink }> =
 
       <span>
         <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
-          {DIRECTION_LABELS[direction]}
+          {t(direction)}
         </span>
         <span className="mt-2 block text-lg font-medium leading-snug group-hover:text-primary">
           {item.title}
@@ -51,8 +48,11 @@ const AdjacentLink: React.FC<{ direction: Direction; item: AdjacentNewsLink }> =
 export const NewsPostNav: React.FC<{
   next: AdjacentNewsLink | null
   previous: AdjacentNewsLink | null
-}> = ({ next, previous }) => (
-  <nav aria-label="More news" className="flex items-start justify-between gap-8">
+}> = ({ next, previous }) => {
+  const t = useTranslations('News')
+
+  return (
+  <nav aria-label={t('moreNews')} className="flex items-start justify-between gap-8">
     <div className="flex-1">
       <Show when={!!previous}>
         <AdjacentLink direction="previous" item={previous!} />
@@ -64,5 +64,6 @@ export const NewsPostNav: React.FC<{
         <AdjacentLink direction="next" item={next!} />
       </Show>
     </div>
-  </nav>
-)
+    </nav>
+  )
+}

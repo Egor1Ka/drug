@@ -12,6 +12,22 @@
     "showingRange": "Showing {from} - {to} of {total} {total, plural, one {Post} other {Posts}}",
     "noResults": "No posts found."
   },
+  "CaseStudies": {
+    "title": "Case Studies",
+    "subtitle": "How pharmacovigilance teams transformed literature screening with DrugCard.",
+    "readMore": "Read case study",
+    "snapshot": {
+      "client": "Client",
+      "location": "Location",
+      "products": "Products",
+      "result": "Result"
+    },
+    "cta": {
+      "heading": "Ready to Achieve Similar Results?",
+      "text": "Book a personalised demo and see what DrugCard can do for your team.",
+      "button": "Book a demo"
+    }
+  },
   "ContactModal": {
     "title": "Contact us",
     "subtitle": "Leave your details and we will get back to you shortly",
@@ -154,6 +170,7 @@
     }
   },
   "Layout": {
+    "breadcrumb": "Breadcrumb",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "toggleSubmenu": "Toggle submenu",
@@ -162,5 +179,17 @@
     "newsletterSubmit": "Subscribe",
     "newsletterSending": "Sending...",
     "newsletterError": "Something went wrong. Please try again."
+  },
+  "News": {
+    "title": "News & Updates",
+    "subtitle": "Stay informed about the latest from DrugCard.",
+    "description": "Product releases, industry events, and insights from the world of pharmacovigilance.",
+    "next": "Next",
+    "previous": "Previous",
+    "moreNews": "More news"
+  },
+  "NotFound": {
+    "message": "This page could not be found.",
+    "goHome": "Go home"
   }
 }

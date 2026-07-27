@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import type { Post } from '@/payload-types'
@@ -41,6 +42,7 @@ const AuthorByline: React.FC<{ authors: PopulatedAuthor[] }> = ({ authors }) => 
 }
 
 export const BlogCard: React.FC<{ post: BlogCardPost }> = ({ post }) => {
+  const t = useTranslations('Blog')
   const { heroImage, meta, populatedAuthors, publishedAt, slug, title } = post
 
   const heroImageObject = heroImage && typeof heroImage === 'object' ? heroImage : null
@@ -68,7 +70,7 @@ export const BlogCard: React.FC<{ post: BlogCardPost }> = ({ post }) => {
             href={href}
             className="inline-block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
-            Learn more
+            {t('learnMore')}
           </Link>
         </div>
       </div>
