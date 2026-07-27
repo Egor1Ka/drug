@@ -31,6 +31,7 @@ export const MANAGED_COLLECTIONS = {
   news: { label: 'News', publicRead: 'published' },
   'case-studies': { label: 'Case Studies', publicRead: 'published' },
   documents: { label: 'Documents', publicRead: 'published' },
+  journals: { label: 'Journals', publicRead: 'published' },
   'page-content': { label: 'Page Contents', publicRead: 'open' },
   media: { label: 'Media', publicRead: 'open' },
   categories: { label: 'Categories', publicRead: 'open' },

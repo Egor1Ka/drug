@@ -134,6 +134,25 @@
       "requestDemo": "Request a demo"
     }
   },
+  "Journals": {
+    "title": "List of Local Medical Journals",
+    "subtitle": "Explore the country-specific local medical journals already available on DrugCard. We continuously expand our database and can add any journal you need — fast and without bureaucracy.",
+    "breadcrumbHome": "Home",
+    "breadcrumbCurrent": "Local Medical Journals",
+    "download": "Download",
+    "gateTitle": "Fill out the form to get the document.",
+    "downloadFile": "Download PDF",
+    "sending": "Sending...",
+    "formUnavailable": "The form is temporarily unavailable. Please email us instead.",
+    "error": "Something went wrong. Please try again.",
+    "close": "Close",
+    "cta": {
+      "heading": "Have questions for our experts?",
+      "text": "Ask us about pharmacovigilance automation, medical literature screening, or DrugCard platform features.",
+      "bookMeeting": "Book 15 minute meeting",
+      "contactUs": "Contact Us"
+    }
+  },
   "Layout": {
     "openMenu": "Open menu",
     "closeMenu": "Close menu",

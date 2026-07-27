@@ -23,3 +23,4 @@ node_modules/
 /playwright/.cache/
 scripts/seed-prod.local.sh
 scripts/import-documents-prod.local.sh
+scripts/import-journals-prod.local.sh

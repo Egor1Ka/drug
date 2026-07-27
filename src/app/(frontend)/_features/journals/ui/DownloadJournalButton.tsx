@@ -5,15 +5,15 @@ import React from 'react'
 
 import { useDownloadGate } from '@frontend/_shared/ui/DownloadGate'
 
-import type { DocumentCardItem } from './DocumentCard'
-import { toDownloadItem } from '../lib/documentFile'
+import type { JournalCardItem } from './JournalCard'
+import { toDownloadItem } from '../lib/journalFile'
 
-// The card's only interactive element: opens the shared gate for this document.
-export const GetPdfButton: React.FC<{ document: DocumentCardItem }> = ({ document }) => {
-  const t = useTranslations('Documents')
+// The card's only interactive element: opens the shared gate for this journal.
+export const DownloadJournalButton: React.FC<{ journal: JournalCardItem }> = ({ journal }) => {
+  const t = useTranslations('Journals')
   const { openGateFor } = useDownloadGate()
 
-  const openOwnGate = () => openGateFor(toDownloadItem(document))
+  const openOwnGate = () => openGateFor(toDownloadItem(journal))
 
   return (
     <button
@@ -21,7 +21,7 @@ export const GetPdfButton: React.FC<{ document: DocumentCardItem }> = ({ documen
       onClick={openOwnGate}
       type="button"
     >
-      {t('getPdf')}
+      {t('download')}
     </button>
   )
 }

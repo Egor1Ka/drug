@@ -1,4 +1,4 @@
 // Client-safe public API of the feature: everything except the server-only
-// fetchPublishedDocuments (payload + node), which must not enter the client
+// fetchPublishedJournals (payload + node), which must not enter the client
 // bundle. Client components import from here, server code from './index'.
-export { GetPdfButton } from './ui/GetPdfButton'
+export { DownloadJournalButton } from './ui/DownloadJournalButton'

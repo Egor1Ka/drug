@@ -6,13 +6,13 @@ import React from 'react'
 
 import type { AppLocale } from '@/i18n/routing'
 
-import {
-  DocumentsArchive,
-  DocumentsCta,
-  DocumentsListingLayout,
-  fetchPublishedDocuments,
-} from '@frontend/_features/documents'
 import { fetchFormBySlug } from '@frontend/_features/forms'
+import {
+  JournalsArchive,
+  JournalsCta,
+  JournalsListingLayout,
+  fetchPublishedJournals,
+} from '@frontend/_features/journals'
 import { Breadcrumbs } from '@frontend/_shared/ui/Breadcrumbs'
 import { DownloadGateProvider } from '@frontend/_shared/ui/DownloadGate'
 import { Show } from '@frontend/_shared/ui/Show'
@@ -22,31 +22,31 @@ import { buildLocaleAlternates } from '@/utilities/buildLocaleAlternates'
 // within ten minutes.
 export const revalidate = 600
 
-// Stable key of the lead form gating every download; editors change the
-// fields, labels and confirmation message in the admin, never here.
-const DOWNLOAD_FORM_SLUG = 'document-download'
+// Journals keep their own lead form, separate from the documents one, so
+// journal requests stay separable from whitepaper requests.
+const DOWNLOAD_FORM_SLUG = 'journal-download'
 
 type Args = {
   params: Promise<{ locale: AppLocale }>
 }
 
-export default async function DocumentsListingPage({ params: paramsPromise }: Args) {
+export default async function JournalsListingPage({ params: paramsPromise }: Args) {
   const { locale } = await paramsPromise
 
   setRequestLocale(locale)
 
-  const t = await getTranslations({ locale, namespace: 'Documents' })
+  const t = await getTranslations({ locale, namespace: 'Journals' })
 
-  const [documents, downloadForm] = await Promise.all([
-    fetchPublishedDocuments({ locale }),
+  const [journals, downloadForm] = await Promise.all([
+    fetchPublishedJournals({ locale }),
     fetchFormBySlug(DOWNLOAD_FORM_SLUG, locale as TypedLocale),
   ])
 
-  const crumbs = [{ href: '/', label: t('breadcrumbHome') }, { label: t('title') }]
+  const crumbs = [{ href: '/', label: t('breadcrumbHome') }, { label: t('breadcrumbCurrent') }]
 
   const gateLabels = {
     close: t('close'),
-    download: t('download'),
+    download: t('downloadFile'),
     error: t('error'),
     formUnavailable: t('formUnavailable'),
     gateTitle: t('gateTitle'),
@@ -55,26 +55,26 @@ export default async function DocumentsListingPage({ params: paramsPromise }: Ar
 
   return (
     <DownloadGateProvider form={downloadForm} labels={gateLabels}>
-      <DocumentsListingLayout>
-        <DocumentsListingLayout.Breadcrumbs>
+      <JournalsListingLayout>
+        <JournalsListingLayout.Breadcrumbs>
           <Breadcrumbs crumbs={crumbs} />
-        </DocumentsListingLayout.Breadcrumbs>
+        </JournalsListingLayout.Breadcrumbs>
 
-        <DocumentsListingLayout.Header>
+        <JournalsListingLayout.Header>
           <h1 className="text-4xl font-semibold md:text-5xl">{t('title')}</h1>
           <p className="mx-auto mt-8 max-w-3xl text-lg text-muted-foreground">{t('subtitle')}</p>
-        </DocumentsListingLayout.Header>
+        </JournalsListingLayout.Header>
 
-        <DocumentsListingLayout.Content>
-          <Show when={documents.docs.length > 0}>
-            <DocumentsArchive items={documents.docs} />
+        <JournalsListingLayout.Content>
+          <Show when={journals.docs.length > 0}>
+            <JournalsArchive items={journals.docs} />
           </Show>
-        </DocumentsListingLayout.Content>
+        </JournalsListingLayout.Content>
 
-        <DocumentsListingLayout.Cta>
-          <DocumentsCta />
-        </DocumentsListingLayout.Cta>
-      </DocumentsListingLayout>
+        <JournalsListingLayout.Cta>
+          <JournalsCta />
+        </JournalsListingLayout.Cta>
+      </JournalsListingLayout>
     </DownloadGateProvider>
   )
 }
@@ -82,11 +82,11 @@ export default async function DocumentsListingPage({ params: paramsPromise }: Ar
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { locale } = await params
 
-  const t = await getTranslations({ locale, namespace: 'Documents' })
+  const t = await getTranslations({ locale, namespace: 'Journals' })
 
   return {
     title: t('title'),
     description: t('subtitle'),
-    alternates: buildLocaleAlternates(locale, '/documents'),
+    alternates: buildLocaleAlternates(locale, '/local-medical-journals'),
   }
 }

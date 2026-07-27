@@ -8,6 +8,7 @@ import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
 import { CaseStudies } from './collections/CaseStudies'
 import { Documents } from './collections/Documents'
+import { Journals } from './collections/Journals'
 import { Media } from './collections/Media'
 import { News } from './collections/News'
 import { PageContent } from './collections/PageContent'
@@ -71,6 +72,7 @@ export default buildConfig({
     News,
     CaseStudies,
     Documents,
+    Journals,
     Media,
     Categories,
     Tags,
